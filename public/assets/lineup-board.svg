@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 308 112" role="img" aria-labelledby="title desc">
+  <title id="title">Lineup builder preview</title>
+  <desc id="desc">A compact lineup builder with player markers on a pitch.</desc>
+  <rect width="308" height="112" fill="#363637"/>
+  <g transform="translate(30 26)">
+    <rect width="142" height="78" rx="6" fill="#2a2b2d"/>
+    <g fill="#cfd3d8" stroke="#70757d" stroke-width="1.2">
+      <circle cx="30" cy="24" r="7"/><circle cx="71" cy="24" r="7"/><circle cx="112" cy="24" r="7"/>
+      <circle cx="30" cy="62" r="7"/><circle cx="71" cy="62" r="7"/><circle cx="112" cy="62" r="7"/>
+    </g>
+    <g fill="#f6f7f8">
+      <circle cx="30" cy="36" r="2"/><circle cx="71" cy="36" r="2"/><circle cx="112" cy="36" r="2"/>
+      <circle cx="30" cy="74" r="2"/><circle cx="71" cy="74" r="2"/><circle cx="112" cy="74" r="2"/>
+    </g>
+  </g>
+  <g transform="translate(171 40)">
+    <rect width="102" height="64" rx="6" fill="#27282a"/>
+    <g fill="#d7dadd" stroke="#777c84" stroke-width="1.2">
+      <circle cx="51" cy="14" r="7"/>
+      <circle cx="24" cy="40" r="7"/><circle cx="51" cy="40" r="7"/><circle cx="78" cy="40" r="7"/>
+    </g>
+    <g fill="#f6f7f8">
+      <circle cx="51" cy="26" r="2"/>
+      <circle cx="24" cy="52" r="2"/><circle cx="51" cy="52" r="2"/><circle cx="78" cy="52" r="2"/>
+    </g>
+  </g>
+</svg>
