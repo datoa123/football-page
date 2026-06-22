@@ -1,227 +1,158 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title><%= title %></title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="topbar__inner">
+    <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar__inner">
         <a class="brand" href="#" aria-label="PitchLive home">
           <span class="brand__mark" aria-hidden="true">
             <span></span><span></span><span></span>
           </span>
-          <span>PitchLive</span>
+            <span>PitchLive</span>
         </a>
 
         <label class="search" for="global-search">
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" />
-          </svg>
-          <input id="global-search" type="search" placeholder="Search" autocomplete="off" />
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/>
+            </svg>
+            <input id="global-search" type="search" placeholder="Search" autocomplete="off"/>
         </label>
 
         <nav class="nav-links" aria-label="Main navigation">
-          <a href="#">News</a>
-          <a href="#">Transfers</a>
-          <a href="#">About</a>
-          <a href="#">TV schedules</a>
+            <a href="#">News</a>
+            <a href="#">Transfers</a>
+            <a href="#">About</a>
+            <a href="#">TV schedules</a>
         </nav>
 
         <div class="top-actions" aria-label="App actions">
-          <button class="icon-button" type="button" aria-label="Settings">
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M12 15.3A3.3 3.3 0 1 0 12 8.7a3.3 3.3 0 0 0 0 6.6Z" />
-              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2.05 2.05 0 0 1-2.9 2.9l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .35 1.7 1.7 0 0 0-.7 1.55V21a2.05 2.05 0 1 1-4.1 0v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2.05 2.05 0 1 1-2.9-2.9l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.35-1 1.7 1.7 0 0 0-1.55-.7H3a2.05 2.05 0 1 1 0-4.1h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2.05 2.05 0 1 1 2.9-2.9l.06.06A1.7 1.7 0 0 0 9 4.6c.36-.15.7-.35 1-.6a1.7 1.7 0 0 0 .7-1.55V2.3a2.05 2.05 0 0 1 4.1 0v.09A1.7 1.7 0 0 0 15.5 4c.31.25.64.45 1 .6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2.05 2.05 0 1 1 2.9 2.9l-.06.06A1.7 1.7 0 0 0 19.4 9c.15.36.35.7.6 1a1.7 1.7 0 0 0 1.55.7h.15a2.05 2.05 0 0 1 0 4.1h-.09A1.7 1.7 0 0 0 19.4 15Z" />
-            </svg>
-          </button>
-          <button class="store-badge" type="button" aria-label="Download on App Store">
-            <svg aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M16.7 13.2c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.1-1.7-1.3-.1-2.6.8-3.3.8-.7 0-1.8-.8-2.9-.8-1.5 0-2.8.9-3.6 2.2-1.5 2.7-.4 6.7 1.1 8.8.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2 0 1.9-1.1 2.7-2.2.8-1.2 1.1-2.3 1.1-2.4-.1-.1-2.3-.9-2.3-3.5Z" />
-              <path d="M14.6 6.7c.6-.8 1.1-1.9 1-3-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2-.5 2.6-1.3Z" />
-            </svg>
-          </button>
-          <button class="store-badge store-badge--play" type="button" aria-label="Get it on Google Play">
-            <span></span>
-          </button>
+            <button class="icon-button" type="button" aria-label="Settings">
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M12 15.3A3.3 3.3 0 1 0 12 8.7a3.3 3.3 0 0 0 0 6.6Z"/>
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2.05 2.05 0 0 1-2.9 2.9l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .35 1.7 1.7 0 0 0-.7 1.55V21a2.05 2.05 0 1 1-4.1 0v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2.05 2.05 0 1 1-2.9-2.9l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.35-1 1.7 1.7 0 0 0-1.55-.7H3a2.05 2.05 0 1 1 0-4.1h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2.05 2.05 0 1 1 2.9-2.9l.06.06A1.7 1.7 0 0 0 9 4.6c.36-.15.7-.35 1-.6a1.7 1.7 0 0 0 .7-1.55V2.3a2.05 2.05 0 0 1 4.1 0v.09A1.7 1.7 0 0 0 15.5 4c.31.25.64.45 1 .6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2.05 2.05 0 1 1 2.9 2.9l-.06.06A1.7 1.7 0 0 0 19.4 9c.15.36.35.7.6 1a1.7 1.7 0 0 0 1.55.7h.15a2.05 2.05 0 0 1 0 4.1h-.09A1.7 1.7 0 0 0 19.4 15Z"/>
+                </svg>
+            </button>
+            <button class="store-badge" type="button" aria-label="Download on App Store">
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M16.7 13.2c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.1-1.7-1.3-.1-2.6.8-3.3.8-.7 0-1.8-.8-2.9-.8-1.5 0-2.8.9-3.6 2.2-1.5 2.7-.4 6.7 1.1 8.8.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2 0 1.9-1.1 2.7-2.2.8-1.2 1.1-2.3 1.1-2.4-.1-.1-2.3-.9-2.3-3.5Z"/>
+                    <path d="M14.6 6.7c.6-.8 1.1-1.9 1-3-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2-.5 2.6-1.3Z"/>
+                </svg>
+            </button>
+            <button class="store-badge store-badge--play" type="button" aria-label="Get it on Google Play">
+                <span></span>
+            </button>
         </div>
-      </div>
-    </header>
+    </div>
+</header>
 
-    <main class="page-shell">
-      <aside class="sidebar sidebar--left" aria-label="League navigation">
+<main class="page-shell">
+    <aside class="sidebar sidebar--left" aria-label="League navigation">
         <section class="panel leagues-panel">
-          <h2>Top leagues</h2>
-          <ul class="league-list">
-            <% topLeagues.forEach((league) => { %>
-              <li>
-                <a href="#">
-                  <% if (league.image) { %>
-                    <img class="league-logo" src="<%= league.image %>" alt="" loading="lazy" />
-                  <% } else { %>
-                    <span class="league-icon <%= league.icon %>"></span>
-                  <% } %>
-                  <%= league.name %>
-                </a>
-              </li>
-            <% }) %>
-          </ul>
+            <h2>Top leagues</h2>
+            <ul class="league-list">
+                <% topLeagues.forEach((league) => { %>
+                    <li>
+                        <a href="#">
+                            <% if (league.image) { %>
+                                <img class="league-logo" src="<%= league.image %>" alt="" loading="lazy"/>
+                            <% } else { %>
+                                <span class="league-icon <%= league.icon %>"></span>
+                            <% } %>
+                            <%= league.name %>
+                        </a>
+                    </li>
+                <% }) %>
+            </ul>
         </section>
 
         <button class="panel all-leagues" type="button">
-          <span>All leagues</span>
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="m7 10 5 5 5-5" />
-          </svg>
+            <span>All leagues</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="m7 10 5 5 5-5"/>
+            </svg>
         </button>
-      </aside>
+    </aside>
 
-      <section class="scores-column" aria-label="Scores">
+    <section class="scores-column" aria-label="Scores">
         <section class="date-panel">
-          <div class="date-panel__top">
-            <button class="circle-button" id="prev-day" type="button" aria-label="Previous day">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-            </button>
-            <button class="date-button" type="button" aria-label="Choose date">
-              <span id="date-label">Recent</span>
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
-            </button>
-            <button class="circle-button" id="next-day" type="button" aria-label="Next day">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></svg>
-            </button>
-          </div>
+            <div class="date-panel__top">
+                <button class="circle-button" id="prev-day" type="button" aria-label="Previous day">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button class="date-button" type="button" aria-label="Choose date">
+                    <span id="date-label">Recent</span>
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m7 10 5 5 5-5"/>
+                    </svg>
+                </button>
+                <button class="circle-button" id="next-day" type="button" aria-label="Next day">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
 
-          <div class="filter-row" aria-label="Score filters">
-            <button class="filter-chip is-active" type="button" data-filter="recent">Recent</button>
-            <button class="filter-chip" type="button" data-filter="tv">On TV</button>
-            <button class="filter-chip" type="button" data-filter="time">By time</button>
-            <button class="filter-search" type="button">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4" /></svg>
-              <span>Filter</span>
-            </button>
-            <button class="circle-button circle-button--small" type="button" aria-label="Sort matches">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5M7 9l5-5 5 5" /></svg>
-            </button>
-          </div>
+            <div class="filter-row" aria-label="Score filters">
+                <button class="filter-chip is-active" type="button" data-filter="recent">Recent</button>
+                <button class="filter-chip" type="button" data-filter="tv">On TV</button>
+                <button class="filter-chip" type="button" data-filter="time">By time</button>
+                <button class="filter-search" type="button">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M4 7h16M7 12h10M10 17h4"/>
+                    </svg>
+                    <span>Filter</span>
+                </button>
+                <button class="circle-button circle-button--small" type="button" aria-label="Sort matches">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>
+                    </svg>
+                </button>
+            </div>
         </section>
 
-        <div class="match-stack" id="match-stack">
-          <% leagues.forEach((league, leagueIndex) => { %>
-            <% if (leagueIndex === 1) { %>
-              <button class="hide-all" type="button" id="hide-all">
-                <span>Hide all</span>
-                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 14 5-5 5 5" /></svg>
-              </button>
-            <% } %>
+        <!--
+          Intentionally empty: app.js calls loadScores() on every page load,
+          which fetches /api/recent-matches (or /api/scores) and renders the
+          league cards / match rows into this container. Rendering them here
+          server-side too would just be replaced immediately and would risk
+          drifting out of sync with render-list.js's markup.
+        -->
+        <div class="match-stack" id="match-stack"></div>
+    </section>
 
-            <article class="match-card <%= league.className %>" data-league data-title="<%= league.searchTitle %>">
-              <button class="league-header" type="button" aria-expanded="true">
-                <span class="league-title">
-                  <% if (league.image) { %>
-                    <img class="league-logo league-logo--card" src="<%= league.image %>" alt="" loading="lazy" />
-                  <% } else if (league.countryFlag) { %>
-                    <img class="league-logo league-logo--card" src="<%= league.countryFlag %>" alt="" loading="lazy" />
-                  <% } else if (league.icon) { %>
-                    <span class="league-icon <%= league.icon %>"></span>
-                  <% } else { %>
-                    <span class="country-dot <%= league.countryDot %>"></span>
-                  <% } %>
-                  <%= league.name %>
-                </span>
-                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 14 5-5 5 5" /></svg>
-              </button>
-
-              <div class="league-body <%= league.emptyText ? 'league-body--empty' : '' %>">
-                <% if (league.emptyText) { %>
-                  <p><%= league.emptyText %></p>
-                <% } %>
-
-                <% if (league.groups) { %>
-                  <% league.groups.forEach((group) => { %>
-                    <% if (group.name) { %>
-                      <div class="group-row">
-                        <span><%= group.name %></span>
-                      </div>
-                    <% } %>
-
-                    <% group.matches.forEach((match) => { %>
-                      <a class="match-row <%= match.rowClass || '' %>" href="#">
-                        <span class="status <%= match.statusClass || '' %>"><%= match.status %></span>
-                        <span class="team team--home">
-                          <%= match.home %>
-                          <% if (match.homeLogo) { %>
-                            <img class="team-logo" src="<%= match.homeLogo %>" alt="" loading="lazy" />
-                          <% } else { %>
-                            <span class="<%= match.homeBadge %>"></span>
-                          <% } %>
-                        </span>
-                        <% if (match.fixtureText) { %>
-                          <span class="score score--time"><%= match.fixtureText %></span>
-                        <% } else { %>
-                          <span class="score"><strong><%= match.homeScore %></strong><span>-</span><strong><%= match.awayScore %></strong></span>
-                        <% } %>
-                        <span class="team team--away">
-                          <% if (match.awayLogo) { %>
-                            <img class="team-logo" src="<%= match.awayLogo %>" alt="" loading="lazy" />
-                          <% } else { %>
-                            <span class="<%= match.awayBadge %>"></span>
-                          <% } %>
-                          <%= match.away %>
-                        </span>
-                        <span class="match-icons">
-                          <% ;(match.icons || []).forEach((icon) => { %>
-                            <% if (icon === 'tv') { %>
-                              <span class="tv">tv</span>
-                            <% } else { %>
-                              <span></span>
-                            <% } %>
-                          <% }) %>
-                        </span>
-                      </a>
-                    <% }) %>
-                  <% }) %>
-                <% } %>
-
-                <% if (league.footer) { %>
-                  <button class="after-midnight" type="button">
-                    <span><%= league.footer %></span>
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
-                  </button>
-                <% } %>
-              </div>
-            </article>
-          <% }) %>
-        </div>
-      </section>
-
-      <aside class="sidebar sidebar--right" aria-label="Football widgets">
+    <aside class="sidebar sidebar--right" aria-label="Football widgets">
         <section class="panel promo-card">
-          <div class="widget-heading">
-            <div>
-              <h2>PitchLive Predict</h2>
-              <p>Make your predictions</p>
+            <div class="widget-heading">
+                <div>
+                    <h2>PitchLive Predict</h2>
+                    <p>Make your predictions</p>
+                </div>
+                <span class="widget-icon widget-icon--blue"></span>
             </div>
-            <span class="widget-icon widget-icon--blue"></span>
-          </div>
-          <img src="/assets/predictor-card.svg" alt="Prediction game preview" />
+            <img src="/assets/predictor-card.svg" alt="Prediction game preview"/>
         </section>
 
         <section class="panel transfers-card">
-          <div class="widget-heading">
-            <div>
-              <h2>Top transfers</h2>
-              <p>By date</p>
+            <div class="widget-heading">
+                <div>
+                    <h2>Top transfers</h2>
+                    <p>By date</p>
+                </div>
+                <span class="widget-icon widget-icon--green"></span>
             </div>
-            <span class="widget-icon widget-icon--green"></span>
-          </div>
 
-          <ol class="transfer-list">
-            <% transfers.forEach((transfer) => { %>
-              <li>
-                <span class="avatar <%= transfer.avatar %>"></span>
-                <span>
+            <ol class="transfer-list">
+                <% transfers.forEach((transfer) => { %>
+                    <li>
+                        <span class="avatar <%= transfer.avatar %>"></span>
+                        <span>
                   <strong><%= transfer.name %></strong>
                   <small>
                     <i class="club <%= transfer.clubs[0] %>"></i>
@@ -229,27 +160,27 @@
                     <i class="club <%= transfer.clubs[1] %>"></i>
                   </small>
                 </span>
-                <b><%= transfer.value %></b>
-              </li>
-            <% }) %>
-          </ol>
+                        <b><%= transfer.value %></b>
+                    </li>
+                <% }) %>
+            </ol>
 
-          <a class="transfer-center" href="#">Transfer Center</a>
+            <a class="transfer-center" href="#">Transfer Center</a>
         </section>
 
         <section class="panel lineup-card">
-          <div class="widget-heading">
-            <div>
-              <h2>Build your own XI</h2>
-              <p>Try our lineup builder</p>
+            <div class="widget-heading">
+                <div>
+                    <h2>Build your own XI</h2>
+                    <p>Try our lineup builder</p>
+                </div>
+                <span class="widget-icon widget-icon--grid"></span>
             </div>
-            <span class="widget-icon widget-icon--grid"></span>
-          </div>
-          <img src="/assets/lineup-board.svg" alt="Lineup builder preview" />
+            <img src="/assets/lineup-board.svg" alt="Lineup builder preview"/>
         </section>
-      </aside>
-    </main>
+    </aside>
+</main>
 
-    <script src="/app.js"></script>
-  </body>
+<script type="module" src="/app.js"></script>
+</body>
 </html>
