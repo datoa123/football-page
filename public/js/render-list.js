@@ -56,9 +56,6 @@ export function renderMatchIcons(icons = []) {
         .join("");
 }
 
-// Registers `match`/`league`/`group` against `key` so a click handler can
-// look up the full detail object later (the anchor only carries the key in
-// its dataset, not the whole object).
 export function renderMatch(match, context, matchDetailByKey) {
     matchDetailByKey.set(context.key, {
         match,
@@ -129,7 +126,7 @@ export function renderLeagueCard(league, leagueIndex, matchDetailByKey) {
         </span>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 14 5-5 5 5" /></svg>
       </button>
-
+ 
       <div class="league-body ${league.emptyText ? "league-body--empty" : ""}">
         ${emptyText}
         ${groups}
@@ -139,8 +136,6 @@ export function renderLeagueCard(league, leagueIndex, matchDetailByKey) {
   `;
 }
 
-// Renders the full leagues list into matchStack and rebuilds matchDetailByKey
-// as a side effect (via renderLeagueCard -> renderMatch).
 export function renderScores(leagues, matchStack, matchDetailByKey) {
     matchDetailByKey.clear();
 
@@ -158,6 +153,60 @@ export function renderScores(leagues, matchStack, matchDetailByKey) {
 
             return `${hideAllButton}${renderLeagueCard(league, index, matchDetailByKey)}`;
         })
+        .join("");
+
+    matchStack.innerHTML = html;
+}
+
+function groupMatchesByRound(matches) {
+    const groupsByRound = new Map();
+
+    matches.forEach((match) => {
+        const roundKey = match.round || "";
+
+        if (!groupsByRound.has(roundKey)) {
+            groupsByRound.set(roundKey, {name: roundKey, matches: []});
+        }
+
+        groupsByRound.get(roundKey).matches.push(match);
+    });
+
+    return Array.from(groupsByRound.values());
+}
+
+export function renderWorldCupDay(day, dayIndex, matchDetailByKey) {
+    const groups = groupMatchesByRound(day.matches || []);
+    const emptyText = groups.length === 0 ? `<p>No matches ${escapeHtml(day.label.toLowerCase())}</p>` : "";
+    const body = groups
+        .map((group, groupIndex) => renderGroup(group, {
+            name: "FIFA World Cup",
+            icon: "trophy"
+        }, dayIndex, groupIndex, matchDetailByKey))
+        .join("");
+
+    return `
+    <article class="match-card featured-league" data-league data-title="${escapeHtml(day.label)} FIFA World Cup">
+      <button class="league-header" type="button" aria-expanded="true">
+        <span class="league-title">
+          <span class="league-icon trophy"></span>
+          FIFA World Cup &middot; ${escapeHtml(day.label)}
+        </span>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 14 5-5 5 5" /></svg>
+      </button>
+ 
+      <div class="league-body ${groups.length === 0 ? "league-body--empty" : ""}">
+        ${emptyText}
+        ${body}
+      </div>
+    </article>
+  `;
+}
+
+export function renderWorldCupDays(days, matchStack, matchDetailByKey) {
+    matchDetailByKey.clear();
+
+    const html = days
+        .map((day, index) => renderWorldCupDay(day, index, matchDetailByKey))
         .join("");
 
     matchStack.innerHTML = html;

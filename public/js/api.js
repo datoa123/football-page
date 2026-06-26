@@ -3,9 +3,18 @@ import {renderMatchDetail} from "./render-detail.js";
 
 const matchApiDetailCache = new Map();
 
-// Fetches /api/recent-matches or /api/scores?date=... depending on scoreMode.
-// requestIdRef is a mutable { current } box so callers can detect and ignore
-// stale responses if a newer request started before this one resolved.
+export async function fetchWorldCup() {
+    const response = await fetch("/api/world-cup", {
+        headers: {Accept: "application/json"},
+    });
+
+    if (!response.ok) {
+        throw new Error(`World Cup request failed with ${response.status}`);
+    }
+
+    return response.json();
+}
+
 export async function fetchScores({scoreMode, dayOffset}) {
     if (scoreMode === "recent") {
         const response = await fetch("/api/recent-matches", {
@@ -31,10 +40,18 @@ export async function fetchScores({scoreMode, dayOffset}) {
     return response.json();
 }
 
-// Fetches and caches per-fixture detail (lineups/playerStats/events), then
-// re-renders the detail screen once data is in. Safe to call even if the
-// user has since navigated away or opened a different match: it checks
-// isStillRelevant() before touching the DOM.
+export async function fetchLeagueDetail(slug) {
+    const response = await fetch(`/api/league/${encodeURIComponent(slug)}`, {
+        headers: {Accept: "application/json"},
+    });
+
+    if (!response.ok) {
+        throw new Error(`League detail request failed with ${response.status}`);
+    }
+
+    return response.json();
+}
+
 export async function loadMatchApiDetail(detail, matchStack, isStillRelevant) {
     const fixtureId = detail.match.id;
 

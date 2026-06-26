@@ -4,11 +4,18 @@ import {
     formatGoalEvent,
     getEventsForSide,
     getLineupForSide,
+    getMatchHighestRating,
     getTeamAverageRating,
     isGoalEvent,
 } from "./lineup.js";
 
-const detailTabs = ["Facts", "Commentary", "Lineup", "Table", "Stats", "Head-to-Head"];
+const detailTabs = ["Lineup", "Table", "Stats"];
+
+function getDisplayLastName(fullName) {
+    const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+
+    return parts.length > 0 ? parts[parts.length - 1] : fullName;
+}
 
 function renderMetaIcon(path) {
     return `<svg aria-hidden="true" viewBox="0 0 24 24"><path d="${path}" /></svg>`;
@@ -65,7 +72,7 @@ function renderEventLines(detail, side) {
 function renderPlayer(player, teamLogo, teamName, side) {
     const initials = getInitials(player.name);
     const safeImage = safeImageUrl(player.photo || teamLogo);
-    const toneClass = player.tone === "orange" ? "lineup-rating--orange" : "";
+    const toneClass = player.tone ? `lineup-rating--${escapeHtml(player.tone)}` : "";
     const markerStyle = `left: ${player.x}%; top: ${player.y}%;`;
     const playerCards = Array.isArray(player.cards) ? player.cards : player.card ? [{color: "yellow"}] : [];
     const cards = playerCards
@@ -76,11 +83,33 @@ function renderPlayer(player, teamLogo, teamName, side) {
         .join("");
     const number = player.number ? `${player.number} ` : "";
 
+    const eventIcons = [];
+    if (player.scoredGoal) {
+        eventIcons.push(
+            `<span class="player-stat-icon player-stat-icon--goal" title="Goal"><img src="/assets/football-ball.svg" alt="Goal" /></span>`,
+        );
+    }
+    if (player.gotAssist) {
+        eventIcons.push(
+            `<span class="player-stat-icon player-stat-icon--assist" title="Assist"><img src="/assets/football-shoe.svg" alt="Assist" /></span>`,
+        );
+    }
+    const eventIconsMarkup = eventIcons.length
+        ? `<span class="player-stat-icons">${eventIcons.join("")}</span>`
+        : "";
+
+    const subOffMarkup = player.substitutedOff
+        ? `<span class="player-sub-off" title="Substituted off"></span>`
+        : "";
+    const captainMarkup = player.captain ? `<span class="captain-mark">C</span>` : "";
+
     return `
     <div class="lineup-player lineup-player--${escapeHtml(side)}" style="${escapeHtml(markerStyle)}">
       ${player.event ? `<span class="player-event">${escapeHtml(player.event)}</span>` : ""}
       ${player.rating ? `<span class="lineup-rating ${toneClass}">${escapeHtml(player.rating)}</span>` : ""}
+      ${subOffMarkup}
       ${cards}
+      ${eventIconsMarkup}
       <span class="player-avatar">
         ${
         safeImage
@@ -88,16 +117,16 @@ function renderPlayer(player, teamLogo, teamName, side) {
             : `<span>${escapeHtml(initials)}</span>`
     }
       </span>
-      <strong>${escapeHtml(number)}${escapeHtml(player.name)}</strong>
-      ${player.captain ? `<span class="captain-mark">C</span>` : ""}
+      <strong>${captainMarkup}${escapeHtml(number)}<span class="player-name-group">${escapeHtml(getDisplayLastName(player.name))}</span></strong>
     </div>
   `;
 }
 
 function renderPitch(detail) {
     const match = detail.match;
-    const homePlayers = buildLineupPlayers(detail, "home");
-    const awayPlayers = buildLineupPlayers(detail, "away");
+    const highestRating = getMatchHighestRating(detail);
+    const homePlayers = buildLineupPlayers(detail, "home", highestRating);
+    const awayPlayers = buildLineupPlayers(detail, "away", highestRating);
     const hasPlayers = homePlayers.length > 0 || awayPlayers.length > 0;
     const players = [
         ...homePlayers.map((player) => renderPlayer(player, match.homeLogo, match.home, "home")),
@@ -133,8 +162,6 @@ function renderDetailTiming(statusText) {
     return "";
 }
 
-// Renders the full match detail screen into matchStack and flips the
-// is-match-detail body class so global styles/handlers switch modes.
 export function renderMatchDetail(detail, matchStack) {
     const {match, league, group} = detail;
     const leagueContext = match.round || group?.name || "";

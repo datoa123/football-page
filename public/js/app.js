@@ -1,36 +1,43 @@
 import {formatDay} from "./utils.js";
-import {renderScores} from "./render-list.js";
+import {renderScores, renderWorldCupDays} from "./render-list.js";
 import {renderMatchDetail} from "./render-detail.js";
-import {fetchScores, loadMatchApiDetail} from "./api.js";
+import {renderLeagueDetail} from "./render-league.js";
+import {fetchLeagueDetail, fetchScores, fetchWorldCup, loadMatchApiDetail} from "./api.js";
 
 const searchInput = document.querySelector("#global-search");
 const matchStack = document.querySelector("#match-stack");
 const dateLabel = document.querySelector("#date-label");
 const filterChips = Array.from(document.querySelectorAll(".filter-chip"));
 
-// --- shared state -----------------------------------------------------
 let dayOffset = 0;
 let allCollapsed = false;
 let activeRequestId = 0;
 let activeDetailRequestId = 0;
-let scoreMode = "recent";
+let scoreMode = "world-cup";
 let currentLeagues = [];
+let currentWorldCupDays = [];
+let currentLeagueDetail = null;
+let currentLeagueTab = "table";
 
-// Maps "leagueIndex:groupIndex:matchIndex" -> { match, league, group } so a
-// click on a match row can look up the full object behind it.
+const leagueDetailCache = new Map();
+const leagueSidebar = document.querySelector(".leagues-panel");
+
 const matchDetailByKey = new Map();
 
 const emptyState = document.createElement("div");
 emptyState.className = "no-results";
 emptyState.textContent = "No leagues match that search";
 
-// --- small DOM helpers that don't belong in a rendering module --------
-
 function getLeagueCards() {
     return Array.from(document.querySelectorAll("[data-league]"));
 }
 
 function updateDate() {
+    if (scoreMode === "world-cup") {
+        dateLabel.textContent = "Today";
+        return;
+    }
+
     dateLabel.textContent = scoreMode === "recent" ? "Recent" : formatDay(dayOffset);
 }
 
@@ -70,12 +77,16 @@ function applySearch() {
     }
 }
 
-// --- view switching -----------------------------------------------------
-
 function showScoreList() {
     activeDetailRequestId += 1;
-    document.body.classList.remove("is-match-detail");
-    renderScores(currentLeagues, matchStack, matchDetailByKey);
+    document.body.classList.remove("is-match-detail", "is-league-detail");
+
+    if (scoreMode === "world-cup") {
+        renderWorldCupDays(currentWorldCupDays, matchStack, matchDetailByKey);
+    } else {
+        renderScores(currentLeagues, matchStack, matchDetailByKey);
+    }
+
     allCollapsed = false;
     applySearch();
 }
@@ -84,6 +95,7 @@ function showMatchDetail(detail) {
     const requestId = activeDetailRequestId + 1;
     activeDetailRequestId = requestId;
 
+    document.body.classList.remove("is-league-detail");
     renderMatchDetail(detail, matchStack);
     loadMatchApiDetail(
         detail,
@@ -91,6 +103,75 @@ function showMatchDetail(detail) {
         () => requestId === activeDetailRequestId && document.body.classList.contains("is-match-detail"),
     );
     window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function showLeagueDetail(tab) {
+    if (!currentLeagueDetail) {
+        return;
+    }
+
+    currentLeagueTab = tab;
+    document.body.classList.remove("is-match-detail");
+    renderLeagueDetail(currentLeagueDetail, matchStack, currentLeagueTab);
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+async function loadLeagueDetail(slug) {
+    const requestId = activeDetailRequestId + 1;
+    activeDetailRequestId = requestId;
+    currentLeagueTab = "table";
+
+    if (leagueDetailCache.has(slug)) {
+        currentLeagueDetail = leagueDetailCache.get(slug);
+        showLeagueDetail(currentLeagueTab);
+        return;
+    }
+
+    matchStack.classList.add("is-loading");
+
+    try {
+        const data = await fetchLeagueDetail(slug);
+
+        if (requestId !== activeDetailRequestId) {
+            return;
+        }
+
+        leagueDetailCache.set(slug, data);
+        currentLeagueDetail = data;
+        showLeagueDetail(currentLeagueTab);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        if (requestId === activeDetailRequestId) {
+            matchStack.classList.remove("is-loading");
+        }
+    }
+}
+
+async function loadWorldCup() {
+    const requestId = activeRequestId + 1;
+    activeRequestId = requestId;
+    matchStack.classList.add("is-loading");
+
+    try {
+        const data = await fetchWorldCup();
+
+        if (requestId !== activeRequestId) {
+            return;
+        }
+
+        currentWorldCupDays = data.days || [];
+        document.body.classList.remove("is-match-detail");
+        renderWorldCupDays(currentWorldCupDays, matchStack, matchDetailByKey);
+        allCollapsed = false;
+        applySearch();
+    } catch (error) {
+        console.error(error);
+    } finally {
+        if (requestId === activeRequestId) {
+            matchStack.classList.remove("is-loading");
+        }
+    }
 }
 
 async function loadScores() {
@@ -119,7 +200,18 @@ async function loadScores() {
     }
 }
 
-// --- event wiring -----------------------------------------------------
+if (leagueSidebar) {
+    leagueSidebar.addEventListener("click", (event) => {
+        const leagueLink = event.target.closest("[data-league-slug]");
+
+        if (!leagueLink) {
+            return;
+        }
+
+        event.preventDefault();
+        loadLeagueDetail(leagueLink.dataset.leagueSlug);
+    });
+}
 
 document.querySelector("#prev-day").addEventListener("click", () => {
     scoreMode = "day";
@@ -146,10 +238,10 @@ filterChips.forEach((chip) => {
         setActiveFilter(filter);
 
         if (filter === "recent") {
-            scoreMode = "recent";
+            scoreMode = "world-cup";
             dayOffset = 0;
             updateDate();
-            loadScores();
+            loadWorldCup();
         }
     });
 });
@@ -159,9 +251,15 @@ matchStack.addEventListener("click", (event) => {
     const matchRow = event.target.closest(".match-row[data-match-key]");
     const header = event.target.closest(".league-header");
     const hideAllButton = event.target.closest("#hide-all");
+    const leagueTabButton = event.target.closest("[data-league-tab]");
 
     if (backButton) {
         showScoreList();
+        return;
+    }
+
+    if (leagueTabButton) {
+        showLeagueDetail(leagueTabButton.dataset.leagueTab);
         return;
     }
 
@@ -195,7 +293,5 @@ matchStack.addEventListener("click", (event) => {
     }
 });
 
-// --- init ---------------------------------------------------------------
-
 updateDate();
-loadScores();
+loadWorldCup();

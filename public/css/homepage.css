@@ -1,0 +1,799 @@
+.page-shell {
+    display: grid;
+    grid-template-columns: 19.25rem minmax(27rem, 39.5rem) 19.25rem;
+    gap: 1rem;
+    width: min(80rem, calc(100% - 2rem));
+    margin: 1rem auto 3rem;
+    align-items: start;
+}
+
+.sidebar {
+    display: grid;
+    gap: 1rem;
+}
+
+.panel,
+.date-panel,
+.match-card {
+    border-radius: var(--radius);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.leagues-panel {
+    padding: 1.35rem 1.45rem 0.75rem;
+}
+
+.panel h2 {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.panel p {
+    margin: 0.25rem 0 0;
+    color: #c3c8d0;
+    font-size: 0.88rem;
+}
+
+.league-list {
+    display: grid;
+    gap: 0.15rem;
+    padding: 1.05rem 0 0;
+    margin: 0;
+    list-style: none;
+}
+
+.league-list a {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 2.5rem;
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 750;
+}
+
+.league-list a:hover,
+.league-list a:focus-visible {
+    background: #28282a;
+    outline: 0;
+}
+
+.league-icon,
+.country-dot,
+.club,
+.flag {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+}
+
+.league-logo,
+.team-logo {
+    display: block;
+    flex: 0 0 auto;
+    object-fit: contain;
+}
+
+.league-logo {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 4px;
+}
+
+.league-logo--card {
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.team-logo {
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 0.08rem;
+    border-radius: 50%;
+    background: #f6f7f8;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.league-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.league-icon::before {
+    content: "";
+    display: block;
+}
+
+.trophy::before {
+    width: 0.56rem;
+    height: 0.75rem;
+    border: 2px solid #f5f0d8;
+    border-top-width: 4px;
+    border-radius: 2px 2px 5px 5px;
+    box-shadow: 0 0.48rem 0 -0.26rem #f5f0d8;
+}
+
+.lion::before {
+    width: 0.86rem;
+    height: 0.86rem;
+    border: 2px solid #e7e7ea;
+    border-radius: 48% 52% 45% 55%;
+}
+
+.ball::before {
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px dashed #efefef;
+    border-radius: 50%;
+}
+
+.laliga::before {
+    width: 0.95rem;
+    height: 0.95rem;
+    border-left: 4px solid var(--red);
+    border-bottom: 4px solid var(--red);
+    border-radius: 50%;
+    transform: rotate(35deg);
+}
+
+.bundesliga::before {
+    width: 1rem;
+    height: 0.7rem;
+    border-radius: 2px;
+    background: linear-gradient(135deg, #e50e2e 0 55%, white 56% 67%, #e50e2e 68%);
+}
+
+.seriea::before {
+    width: 0.8rem;
+    height: 1.05rem;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: linear-gradient(135deg, #16a6ff, #075bd8);
+}
+
+.ligue1::before {
+    width: 0.82rem;
+    height: 0.82rem;
+    border: 2px solid #e8e8ea;
+    border-radius: 35% 65% 35% 65%;
+    transform: rotate(30deg);
+}
+
+.europa::before {
+    width: 0.82rem;
+    height: 1rem;
+    border: 2px solid #ff8a24;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px #1e1e1f;
+}
+
+.eredivisie::before {
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid #f0f0f0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 3px #1e1e1f;
+}
+
+.all-leagues {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 4.15rem;
+    padding: 0 1.55rem;
+    border: 0;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.all-leagues svg {
+    fill: currentColor;
+    stroke: none;
+}
+
+.scores-column {
+    min-width: 0;
+}
+
+.date-panel {
+    overflow: hidden;
+}
+
+.date-panel__top {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr 2.25rem;
+    align-items: center;
+    min-height: 3.6rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.circle-button {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.circle-button--small {
+    width: 2rem;
+    height: 2rem;
+}
+
+.date-button {
+    display: inline-flex;
+    justify-self: center;
+    align-items: center;
+    gap: 0.45rem;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.date-button svg,
+.after-midnight svg,
+.hide-all svg {
+    fill: currentColor;
+    stroke: none;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: auto auto auto minmax(8rem, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.filter-chip,
+.filter-search {
+    min-height: 2rem;
+    border: 0;
+    border-radius: 999px;
+    background: #353537;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.filter-chip {
+    padding: 0 1.05rem;
+}
+
+.filter-chip.is-active {
+    background: #48484b;
+}
+
+.filter-search {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-start;
+    min-width: 0;
+    padding: 0 1rem;
+    color: #c1c5cb;
+}
+
+.match-stack {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.match-stack.is-loading {
+    opacity: 0.72;
+    pointer-events: none;
+}
+
+.match-card {
+    overflow: hidden;
+}
+
+.featured-league {
+    background: radial-gradient(circle at 15% -5%, rgba(44, 216, 128, 0.62), transparent 9rem),
+    radial-gradient(circle at 28% -10%, rgba(240, 79, 79, 0.55), transparent 8rem),
+    radial-gradient(circle at 82% 0%, rgba(21, 92, 224, 0.8), transparent 12rem),
+    var(--panel);
+}
+
+.league-header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.35rem;
+    padding: 0 1.05rem;
+    border: 0;
+    background: rgba(31, 31, 32, 0.72);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.league-title {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.92rem;
+    font-weight: 900;
+}
+
+.league-header svg {
+    flex: 0 0 auto;
+    fill: currentColor;
+    stroke: none;
+}
+
+.league-body {
+    padding: 0.9rem 1rem 0.95rem;
+    background: rgba(30, 30, 31, 0.96);
+}
+
+.group-row {
+    display: flex;
+    align-items: center;
+    min-height: 1.8rem;
+}
+
+.group-row span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding: 0 0.7rem;
+    border: 1px solid #38383c;
+    border-radius: 6px;
+    color: #c2c7d0;
+    font-size: 0.74rem;
+    font-weight: 750;
+}
+
+.match-row {
+    display: grid;
+    grid-template-columns: 3rem minmax(6rem, 1fr) 4.2rem minmax(6rem, 1fr) 2.8rem;
+    align-items: center;
+    min-height: 3.2rem;
+    border-radius: 6px;
+}
+
+.match-row:hover,
+.match-row:focus-visible {
+    background: #262628;
+    outline: 0;
+}
+
+.status {
+    justify-self: start;
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.55rem;
+    min-height: 1.25rem;
+    border-radius: 999px;
+    background: #3d3d40;
+    color: #b9bec7;
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+.status.live {
+    background: var(--green);
+    color: #062615;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    font-size: 0.88rem;
+    font-weight: 850;
+}
+
+.team--home {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.team--away {
+    justify-content: flex-start;
+}
+
+.score {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.32rem;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.score strong {
+    font-weight: 950;
+}
+
+.score--time {
+    color: #bec4cc;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.match-icons {
+    display: inline-flex;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    color: #8c929b;
+}
+
+.match-icons span:not(.tv) {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+}
+
+.match-icons .tv {
+    display: inline-grid;
+    min-width: 1rem;
+    height: 0.82rem;
+    place-items: center;
+    border-radius: 3px;
+    background: #55585f;
+    color: #d4d8de;
+    font-size: 0.5rem;
+    font-weight: 900;
+}
+
+.flag,
+.club {
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.flag--canada {
+    background: linear-gradient(90deg, #e3343d 0 28%, #fff 28% 72%, #e3343d 72%),
+    #fff;
+}
+
+.flag--canada::before {
+    content: "";
+    width: 0.34rem;
+    height: 0.48rem;
+    background: #e3343d;
+    clip-path: polygon(50% 0, 60% 28%, 86% 18%, 74% 45%, 100% 52%, 68% 60%, 72% 92%, 50% 72%, 28% 92%, 32% 60%, 0 52%, 26% 45%, 14% 18%, 40% 28%);
+}
+
+.flag--qatar {
+    background: linear-gradient(90deg, #fff 0 26%, #8b263a 26%);
+}
+
+.flag--mexico {
+    background: linear-gradient(90deg, #09834a 0 33%, #fff 33% 66%, #d7323f 66%);
+}
+
+.flag--korea {
+    background: radial-gradient(circle at 48% 45%, #e6414b 0 26%, transparent 27%), radial-gradient(circle at 54% 58%, #2869c9 0 26%, transparent 27%), #fff;
+}
+
+.flag--usa {
+    background: repeating-linear-gradient(0deg, #c83745 0 0.14rem, #fff 0.14rem 0.28rem);
+}
+
+.flag--usa::before {
+    content: "";
+    align-self: start;
+    justify-self: start;
+    width: 0.68rem;
+    height: 0.58rem;
+    border-radius: 50% 0 2px 0;
+    background: #315aa6;
+}
+
+.flag--australia {
+    background: radial-gradient(circle at 68% 62%, #fff 0 0.07rem, transparent 0.08rem), #2f4d98;
+}
+
+.flag--australia::before {
+    content: "";
+    justify-self: start;
+    align-self: start;
+    width: 0.62rem;
+    height: 0.62rem;
+    background: linear-gradient(45deg, transparent 40%, #fff 41% 59%, transparent 60%), linear-gradient(-45deg, transparent 40%, #fff 41% 59%, transparent 60%), #2f4d98;
+    border-radius: 50%;
+}
+
+.after-midnight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 2.55rem;
+    border: 0;
+    background: transparent;
+    color: #c5cad1;
+    cursor: pointer;
+    font-size: 0.86rem;
+}
+
+.hide-all {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.6rem;
+    padding: 0 1.35rem;
+    border: 0;
+    border-radius: 999px;
+    background: #444447;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 850;
+}
+
+.compact-league .league-body {
+    padding: 0.8rem 1rem;
+}
+
+.league-body--empty {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: center;
+}
+
+.league-body--empty p {
+    margin: 0.5rem 0 0;
+    color: #bdc3cc;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.country-dot {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.country-dot--argentina {
+    background: linear-gradient(#69b4ed 0 33%, #fff 33% 66%, #69b4ed 66%);
+}
+
+.country-dot--belarus {
+    background: linear-gradient(90deg, #d73949 0 70%, #36a866 70%);
+}
+
+.country-dot--brazil {
+    background: #1aa957;
+}
+
+.country-dot--brazil::before {
+    content: "";
+    width: 0.58rem;
+    height: 0.58rem;
+    background: #ffd54a;
+    transform: rotate(45deg);
+}
+
+.crest-blue {
+    background: linear-gradient(135deg, #0c8ee8, #bceaff);
+}
+
+.crest-green {
+    background: linear-gradient(135deg, #20c577, #0d5a3a);
+}
+
+.crest-red {
+    background: linear-gradient(135deg, #ff4c4c, #161616 45% 60%, #ff4c4c);
+}
+
+.widget-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1rem 0.8rem;
+}
+
+.widget-icon {
+    position: relative;
+    display: inline-grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 1px solid #383a3e;
+    border-radius: 50%;
+}
+
+.widget-icon::before {
+    content: "";
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 3px;
+}
+
+.widget-icon--blue::before {
+    background: linear-gradient(135deg, #2bffe0 0 50%, #1d75ff 50%);
+    transform: skew(-14deg);
+}
+
+.widget-icon--green::before {
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 40%, #101a14 0 0.12rem, transparent 0.14rem), var(--green);
+}
+
+.widget-icon--grid::before {
+    background: radial-gradient(circle, #07150c 0 0.09rem, transparent 0.1rem) 0 0 / 0.33rem 0.33rem,
+    var(--green);
+    border-radius: 5px;
+}
+
+.promo-card {
+    overflow: hidden;
+}
+
+.promo-card img,
+.lineup-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.transfers-card {
+    overflow: hidden;
+}
+
+.transfer-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+}
+
+.transfer-list li {
+    display: grid;
+    grid-template-columns: 2.8rem minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 4.6rem;
+    gap: 0.85rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #ffd1ae 0 0.55rem, transparent 0.58rem),
+    radial-gradient(circle at 50% 100%, #202022 0 1rem, transparent 1.02rem),
+    #7d6a5e;
+}
+
+.avatar--two {
+    background: radial-gradient(circle at 50% 35%, #f6c7aa 0 0.52rem, transparent 0.55rem),
+    radial-gradient(circle at 50% 100%, #452d22 0 1rem, transparent 1.02rem),
+    #5f3120;
+}
+
+.avatar--three {
+    background: radial-gradient(circle at 50% 35%, #ffd6bd 0 0.54rem, transparent 0.56rem),
+    radial-gradient(circle at 50% 100%, #202022 0 1rem, transparent 1.02rem),
+    #c1774a;
+}
+
+.transfer-list strong {
+    display: block;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.transfer-list small {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.32rem;
+}
+
+.transfer-list b {
+    color: var(--text);
+    font-size: 0.86rem;
+}
+
+.mini-blue {
+    background: #1c94e8;
+}
+
+.mini-navy {
+    background: #24345d;
+}
+
+.mini-yellow {
+    background: #f6bd24;
+}
+
+.mini-red {
+    background: #dc2337;
+}
+
+.mini-violet {
+    background: #7b65ff;
+}
+
+.mini-maroon {
+    background: #9d1d3f;
+}
+
+.transfer-list .club {
+    width: 1rem;
+    height: 1rem;
+}
+
+.move-arrow {
+    position: relative;
+    display: inline-block;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 50%;
+    background: var(--green);
+}
+
+.move-arrow::before {
+    content: "";
+    position: absolute;
+    inset: 0.35rem 0.28rem;
+    border-top: 2px solid #0a2617;
+    border-right: 2px solid #0a2617;
+    transform: rotate(45deg);
+}
+
+.transfer-center {
+    display: grid;
+    min-height: 3.6rem;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 900;
+}
+
+.transfer-center:hover {
+    color: var(--green);
+}
+
+.lineup-card {
+    overflow: hidden;
+}
+
+.is-hidden {
+    display: none;
+}
+
+.is-collapsed .league-body {
+    display: none;
+}
+
+.is-collapsed .league-header svg {
+    transform: rotate(180deg);
+}
+
+.no-results {
+    display: grid;
+    min-height: 9rem;
+    place-items: center;
+    padding: 1rem;
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--muted);
+    text-align: center;
+    font-weight: 800;
+}

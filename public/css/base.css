@@ -1,0 +1,214 @@
+:root {
+    color-scheme: dark;
+    --bg: #050505;
+    --topbar: #171717;
+    --panel: #1e1e1f;
+    --panel-soft: #252526;
+    --panel-lift: #2f2f31;
+    --border: #353538;
+    --text: #f6f7f8;
+    --muted: #aeb4bd;
+    --soft: #747b85;
+    --green: #28d981;
+    --green-dark: #113d2a;
+    --blue: #2f95ee;
+    --red: #f04f4f;
+    --yellow: #ffd75d;
+    --orange: #ff922e;
+    --radius: 8px;
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-width: 320px;
+    background: var(--bg);
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at 45% 16%, rgba(45, 217, 129, 0.12), transparent 20rem),
+    radial-gradient(circle at 61% 8%, rgba(47, 149, 238, 0.12), transparent 19rem),
+    var(--bg);
+    color: var(--text);
+}
+
+button,
+input,
+a {
+    font: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(23, 23, 23, 0.96);
+    backdrop-filter: blur(18px);
+}
+
+.topbar__inner {
+    display: grid;
+    grid-template-columns: 9.5rem minmax(13rem, 21rem) 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    width: min(80rem, calc(100% - 2rem));
+    min-height: 4.75rem;
+    margin: 0 auto;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 0.45rem;
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.brand__mark {
+    position: relative;
+    display: inline-grid;
+    width: 1.05rem;
+    height: 1.05rem;
+    place-items: center;
+}
+
+.brand__mark::after {
+    content: "";
+    width: 0.36rem;
+    height: 0.36rem;
+    border: 2px solid var(--text);
+    border-radius: 50%;
+}
+
+.brand__mark span {
+    position: absolute;
+    left: 0;
+    height: 2px;
+    border-radius: 99px;
+    background: var(--text);
+}
+
+.brand__mark span:nth-child(1) {
+    top: 0.2rem;
+    width: 0.78rem;
+}
+
+.brand__mark span:nth-child(2) {
+    top: 0.52rem;
+    width: 0.5rem;
+}
+
+.brand__mark span:nth-child(3) {
+    bottom: 0.18rem;
+    width: 0.28rem;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    height: 2.45rem;
+    padding: 0 0.95rem;
+    border-radius: 999px;
+    background: #2a2a2b;
+    color: var(--muted);
+}
+
+.search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+}
+
+.search input::placeholder {
+    color: #8f949d;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(1rem, 3vw, 2.35rem);
+    white-space: nowrap;
+}
+
+.nav-links a {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.nav-links a:hover {
+    color: var(--green);
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.95rem;
+}
+
+.icon-button,
+.store-badge,
+.circle-button {
+    display: inline-grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: #2b2b2d;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.icon-button,
+.store-badge {
+    width: 2rem;
+    height: 2rem;
+}
+
+.store-badge svg {
+    fill: currentColor;
+    stroke: none;
+}
+
+.store-badge--play span {
+    width: 0;
+    height: 0;
+    border-top: 0.48rem solid transparent;
+    border-bottom: 0.48rem solid transparent;
+    border-left: 0.78rem solid var(--green);
+    filter: drop-shadow(0.32rem 0 0 #3d7cff) drop-shadow(-0.12rem 0.28rem 0 #ffcf4a);
+}

@@ -1,5 +1,3 @@
-// Pure helpers: no DOM access, no shared state. Safe to unit test in isolation.
-
 export function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (character) => {
         const replacements = {
@@ -18,7 +16,7 @@ export function safeImageUrl(value) {
     const url = String(value || "").trim();
 
     if (!url) return "";
-    if (url.startsWith("/assets/") || /^https?:\/\//i.test(url)) {
+    if (url.startsWith("/assets/") || url.startsWith("/europa-league/") || /^https?:\/\//i.test(url)) {
         return escapeHtml(url);
     }
 
@@ -50,10 +48,29 @@ export function formatRating(value) {
     return Number.isFinite(rating) ? rating.toFixed(1) : "";
 }
 
-export function getRatingTone(rating) {
+export function getRatingTone(rating, highestRating) {
     const numericRating = Number.parseFloat(rating);
 
-    return Number.isFinite(numericRating) && numericRating < 6.5 ? "orange" : "";
+    if (!Number.isFinite(numericRating)) {
+        return "";
+    }
+
+    const numericHighest = Number.parseFloat(highestRating);
+    const isMatchHighest = Number.isFinite(numericHighest) && numericRating === numericHighest;
+
+    if (isMatchHighest && numericRating >= 7) {
+        return "blue";
+    }
+
+    if (numericRating >= 7) {
+        return "green";
+    }
+
+    if (numericRating >= 6) {
+        return "orange";
+    }
+
+    return "red";
 }
 
 export function getDateForOffset(offset) {

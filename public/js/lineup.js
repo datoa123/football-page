@@ -1,22 +1,19 @@
 import {formatRating, getRatingTone, normalizeLookupValue} from "./utils.js";
 
-// Hardcoded fallback lineup, used only for the static USA vs Australia demo
-// match (no real fixture id) so the UI has something to show before any
-// API data exists.
 const homeLineupFallback = [
     {number: 24, name: "Freese", rating: "6.7", x: 8, y: 66, tone: "orange"},
-    {number: 13, name: "Ream", rating: "7.0", x: 19, y: 38, captain: true},
-    {number: 3, name: "Richards", rating: "7.6", x: 19, y: 64},
-    {number: 5, name: "Robinson", rating: "7.5", x: 32, y: 28, card: true, event: "80'"},
-    {number: 17, name: "Tillman", rating: "7.1", x: 32, y: 49},
-    {number: 4, name: "Adams", rating: "7.5", x: 32, y: 64},
+    {number: 13, name: "Ream", rating: "7.0", x: 19, y: 38, tone: "green", captain: true},
+    {number: 3, name: "Richards", rating: "7.6", x: 19, y: 64, tone: "blue"},
+    {number: 5, name: "Robinson", rating: "7.5", x: 32, y: 28, tone: "green", card: true, event: "80'"},
+    {number: 17, name: "Tillman", rating: "7.1", x: 32, y: 49, tone: "green"},
+    {number: 4, name: "Adams", rating: "7.5", x: 32, y: 64, tone: "green"},
     {number: 20, name: "Balogun", rating: "6.3", x: 45, y: 49, tone: "orange", card: true},
 ];
 
 const awayLineupFallback = [
-    {number: 18, name: "Beach", rating: "5.9", x: 93, y: 66, tone: "orange"},
+    {number: 18, name: "Beach", rating: "5.9", x: 93, y: 66, tone: "red"},
     {number: 4, name: "Italiano", rating: "6.5", x: 82, y: 28, tone: "orange", card: true},
-    {number: 13, name: "O'Neill", rating: "7.1", x: 72, y: 54},
+    {number: 13, name: "O'Neill", rating: "7.1", x: 72, y: 54, tone: "green"},
     {number: 3, name: "Circati", rating: "6.9", x: 82, y: 49, tone: "orange", card: true},
     {number: 19, name: "Souttar", rating: "6.0", x: 82, y: 66, tone: "orange", captain: true},
     {number: 7, name: "Leckie", rating: "6.3", x: 66, y: 28, tone: "orange", event: "61'"},
@@ -81,6 +78,18 @@ export function isCardEvent(event) {
     return normalizeLookupValue(event.type) === "card";
 }
 
+export function isSubstitutionEvent(event) {
+    return normalizeLookupValue(event.type) === "subst";
+}
+
+function eventHasAssist(event, player) {
+    if (event.assistId !== null && event.assistId !== undefined && player.id !== null && player.id !== undefined) {
+        return Number(event.assistId) === Number(player.id);
+    }
+
+    return Boolean(event.assistName) && normalizeLookupValue(event.assistName) === normalizeLookupValue(player.name);
+}
+
 export function getCardColor(event) {
     return normalizeLookupValue(event.detail).includes("red") ? "red" : "yellow";
 }
@@ -95,6 +104,10 @@ function eventMatchesPlayer(event, player) {
 
 function getPlayerEvents(player, events) {
     return events.filter((event) => eventMatchesPlayer(event, player));
+}
+
+function getPlayerAssistEvents(player, events) {
+    return events.filter((event) => isGoalEvent(event) && eventHasAssist(event, player));
 }
 
 export function getTeamAverageRating(detail, side, fallback = "-") {
@@ -241,13 +254,27 @@ function buildPlayerCards(playerStats, playerEvents) {
     return cards.slice(0, 2);
 }
 
-function getPrimaryPlayerMinute(playerEvents) {
-    const event = playerEvents.find(isGoalEvent) || playerEvents.find(isCardEvent);
+export function getMatchHighestRating(detail) {
+    const allRatings = ["home", "away"].flatMap((side) =>
+        (getPlayerStatsForSide(detail, side)?.players || [])
+            .map((player) => Number.parseFloat(player.rating))
+            .filter(Number.isFinite),
+    );
+
+    return allRatings.length > 0 ? Math.max(...allRatings) : null;
+}
+
+function getPrimaryPlayerMinute(playerEvents, playerAssistEvents) {
+    const event =
+        playerEvents.find(isGoalEvent) ||
+        playerAssistEvents.find(Boolean) ||
+        playerEvents.find(isSubstitutionEvent) ||
+        playerEvents.find(isCardEvent);
 
     return event?.minute || "";
 }
 
-export function buildLineupPlayers(detail, side) {
+export function buildLineupPlayers(detail, side, highestRating) {
     const lineup = getLineupForSide(detail, side);
 
     if (!lineup?.startXI?.length) {
@@ -268,19 +295,23 @@ export function buildLineupPlayers(detail, side) {
             number: lineupPlayer.number ?? playerStats?.number ?? "",
         };
         const playerEvents = getPlayerEvents(player, teamEvents);
+        const playerAssistEvents = getPlayerAssistEvents(player, teamEvents);
         const rating = formatRating(playerStats?.rating);
         const position = getLineupPitchPosition(player, side, gridMeta, index);
 
         return {
             ...player,
             rating,
-            tone: getRatingTone(rating),
+            tone: getRatingTone(rating, highestRating),
             photo: playerStats?.photo || "",
             x: position.x,
             y: position.y,
-            event: getPrimaryPlayerMinute(playerEvents),
+            event: getPrimaryPlayerMinute(playerEvents, playerAssistEvents),
             cards: buildPlayerCards(playerStats, playerEvents),
             captain: Boolean(playerStats?.captain),
+            scoredGoal: playerEvents.some(isGoalEvent),
+            gotAssist: playerAssistEvents.length > 0,
+            substitutedOff: playerEvents.some(isSubstitutionEvent),
         };
     });
 }
