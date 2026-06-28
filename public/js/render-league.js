@@ -1,4 +1,4 @@
-import {escapeHtml, safeImageUrl} from "./utils.js";
+import { escapeHtml, safeImageUrl } from "./utils.js";
 
 function renderLeagueLogo(league) {
     const image = safeImageUrl(league.image);
@@ -100,28 +100,95 @@ function renderTable(table) {
   `;
 }
 
-function renderBracketMatch([homeTeam, homeScore, awayTeam, awayScore]) {
+function renderBracketTeamBadge(teamName, slug) {
+    const teamSlug = String(teamName || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    const folder = slug || "europa-league";
+    const image = teamSlug ? safeImageUrl(`/${folder}/${teamSlug}.png`) : "";
+
+    if (!image) {
+        return `<span class="bracket-badge bracket-badge--fallback" aria-hidden="true"></span>`;
+    }
+
+    return `<img class="bracket-badge" src="${image}" alt="" loading="lazy" />`;
+}
+
+function getTeamAbbreviation(teamName) {
+    return String(teamName || "")
+        .replace(/[^a-zA-Z]/g, "")
+        .slice(0, 3)
+        .toUpperCase();
+}
+
+function renderBracketMatch([homeTeam, homeScore, awayTeam, awayScore], slug, gridRow) {
+    const style = gridRow ? ` style="grid-row: ${gridRow};"` : "";
+
     return `
-    <div class="bracket-match">
-      <div class="bracket-team">
-        <span>${escapeHtml(homeTeam)}</span>
-        <strong>${escapeHtml(homeScore)}</strong>
+    <div class="bracket-match"${style}>
+      <div class="bracket-match-teams">
+        <div class="bracket-team">
+          ${renderBracketTeamBadge(homeTeam, slug)}
+          <span title="${escapeHtml(homeTeam)}">${escapeHtml(getTeamAbbreviation(homeTeam))}</span>
+        </div>
+        <div class="bracket-team">
+          ${renderBracketTeamBadge(awayTeam, slug)}
+          <span title="${escapeHtml(awayTeam)}">${escapeHtml(getTeamAbbreviation(awayTeam))}</span>
+        </div>
       </div>
-      <div class="bracket-team">
-        <span>${escapeHtml(awayTeam)}</span>
+      <div class="bracket-match-score">
+        <strong>${escapeHtml(homeScore)}</strong>
+        <span>-</span>
         <strong>${escapeHtml(awayScore)}</strong>
       </div>
     </div>
   `;
 }
 
-function renderBracketColumn(matches, label, columnClass) {
-    const matchesMarkup = matches.map(renderBracketMatch).join("");
+function computeRoundPositions(roundSizes) {
+    const totalUnits = roundSizes[0] * 4;
+    const positionsByRound = [];
+
+    positionsByRound[0] = Array.from({ length: roundSizes[0] }, (_, i) => ({
+        center: i * 4 + 2,
+        span: 2,
+    }));
+
+    for (let round = 1; round < roundSizes.length; round += 1) {
+        const previous = positionsByRound[round - 1];
+
+        positionsByRound[round] = Array.from({ length: roundSizes[round] }, (_, i) => {
+            const center = (previous[i * 2].center + previous[i * 2 + 1].center) / 2;
+            const span = previous[i * 2].span * 2;
+
+            return { center, span };
+        });
+    }
+
+    return { positionsByRound, totalUnits };
+}
+
+function renderBracketColumn(matches, positions, totalUnits, connectorClass, slug) {
+    const matchesMarkup = matches
+        .map((match, index) => {
+            if (!match) {
+                return "";
+            }
+
+            const { center, span } = positions[index];
+            const startRow = center - span / 2 + 1;
+            const gridRow = `${startRow} / span ${span}`;
+
+            return renderBracketMatch(match, slug, gridRow);
+        })
+        .join("");
 
     return `
-    <div class="bracket-column ${escapeHtml(columnClass || "")}">
-      <span class="bracket-column-label">${escapeHtml(label)}</span>
-      <div class="bracket-column-matches">${matchesMarkup}</div>
+    <div class="bracket-column">
+      <div class="bracket-column-matches bracket-column-matches--${escapeHtml(connectorClass || "")}" style="grid-template-rows: repeat(${totalUnits}, 1fr);">
+        ${matchesMarkup}
+      </div>
     </div>
   `;
 }
@@ -132,47 +199,55 @@ function splitInHalf(matches) {
     return [matches.slice(0, midpoint), matches.slice(midpoint)];
 }
 
-function renderKnockout(knockout) {
+function renderKnockout(knockout, slug) {
     if (!knockout) {
         return `<div class="bracket-empty">No knockout data available</div>`;
     }
 
+    const [playoffLeft, playoffRight] = splitInHalf(knockout.playoff || []);
     const [roundOf16Left, roundOf16Right] = splitInHalf(knockout.roundOf16 || []);
     const [quarterFinalsLeft, quarterFinalsRight] = splitInHalf(knockout.quarterFinals || []);
     const [semiFinalsLeft, semiFinalsRight] = splitInHalf(knockout.semiFinals || []);
 
+    const roundSizes = [roundOf16Left.length, quarterFinalsLeft.length, semiFinalsLeft.length];
+    const { positionsByRound, totalUnits } = computeRoundPositions(roundSizes);
+
+    const r16Positions = positionsByRound[0];
+    const playoffPositions = r16Positions;
+
     return `
     <div class="bracket">
       <div class="bracket-half">
-        ${renderBracketColumn(roundOf16Left, "Round of 16")}
-        ${renderBracketColumn(quarterFinalsLeft, "Quarter-finals")}
-        ${renderBracketColumn(semiFinalsLeft, "Semi-finals")}
+        ${renderBracketColumn(playoffLeft, playoffPositions, totalUnits, "to-right", slug)}
+        ${renderBracketColumn(roundOf16Left, positionsByRound[0], totalUnits, "to-right", slug)}
+        ${renderBracketColumn(quarterFinalsLeft, positionsByRound[1], totalUnits, "to-right", slug)}
+        ${renderBracketColumn(semiFinalsLeft, positionsByRound[2], totalUnits, "to-right", slug)}
       </div>
 
       <div class="bracket-final">
-        <span class="bracket-column-label">Final</span>
-        ${knockout.final ? renderBracketMatch(knockout.final) : ""}
         <div class="bracket-champion">
-          <span class="bracket-trophy" aria-hidden="true"></span>
+          ${renderBracketTeamBadge(knockout.champion, slug)}
           <strong>${escapeHtml(knockout.champion || "")}</strong>
           <small>CHAMPION</small>
         </div>
+        ${knockout.final ? renderBracketMatch(knockout.final, slug) : ""}
       </div>
 
       <div class="bracket-half bracket-half--right">
-        ${renderBracketColumn(semiFinalsRight, "Semi-finals")}
-        ${renderBracketColumn(quarterFinalsRight, "Quarter-finals")}
-        ${renderBracketColumn(roundOf16Right, "Round of 16")}
+        ${renderBracketColumn(semiFinalsRight, positionsByRound[2], totalUnits, "to-left", slug)}
+        ${renderBracketColumn(quarterFinalsRight, positionsByRound[1], totalUnits, "to-left", slug)}
+        ${renderBracketColumn(roundOf16Right, positionsByRound[0], totalUnits, "to-left", slug)}
+        ${renderBracketColumn(playoffRight, playoffPositions, totalUnits, "to-left", slug)}
       </div>
     </div>
   `;
 }
 
 export function renderLeagueDetail(detail, matchStack, activeTab = "table") {
-    const {league, table, knockout} = detail;
+    const { league, table, knockout } = detail;
     const hasKnockout = Boolean(knockout);
     const tabs = hasKnockout ? ["table", "knockout"] : ["table"];
-    const tabLabels = {table: "Table", knockout: "Knockout"};
+    const tabLabels = { table: "Table", knockout: "Knockout" };
 
     document.body.classList.add("is-league-detail");
 
@@ -199,7 +274,7 @@ export function renderLeagueDetail(detail, matchStack, activeTab = "table") {
       </nav>
 
       <section class="league-detail-body">
-        ${activeTab === "knockout" ? renderKnockout(knockout) : renderTable(table)}
+        ${activeTab === "knockout" ? renderKnockout(knockout, league.slug) : renderTable(table)}
       </section>
     </section>
   `;

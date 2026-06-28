@@ -7,10 +7,15 @@
     display: none;
 }
 
-.is-match-detail .page-shell,
-.is-league-detail .page-shell {
+.is-match-detail .page-shell {
     display: block;
     width: min(60rem, calc(100% - 0.5rem));
+    margin: 0.4rem auto 2rem;
+}
+
+.is-league-detail .page-shell {
+    display: block;
+    width: min(1278px, calc(100% - 0.5rem));
     margin: 0.4rem auto 2rem;
 }
 
@@ -46,8 +51,9 @@
 }
 
 .detail-hero {
-    background: linear-gradient(155deg, rgba(45, 75, 38, 0.82) 0%, rgba(29, 31, 36, 0.98) 42%),
-    linear-gradient(95deg, #172f76 18%, #0b47cb 62%, #1d2f72 100%);
+    background:
+            linear-gradient(155deg, rgba(45, 75, 38, 0.82) 0%, rgba(29, 31, 36, 0.98) 42%),
+            linear-gradient(95deg, #172f76 18%, #0b47cb 62%, #1d2f72 100%);
 }
 
 .detail-hero__top {

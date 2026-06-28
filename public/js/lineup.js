@@ -309,8 +309,8 @@ export function buildLineupPlayers(detail, side, highestRating) {
             event: getPrimaryPlayerMinute(playerEvents, playerAssistEvents),
             cards: buildPlayerCards(playerStats, playerEvents),
             captain: Boolean(playerStats?.captain),
-            scoredGoal: playerEvents.some(isGoalEvent),
-            gotAssist: playerAssistEvents.length > 0,
+            goalEvents: playerEvents.filter(isGoalEvent),
+            assistEvents: playerAssistEvents,
             substitutedOff: playerEvents.some(isSubstitutionEvent),
         };
     });

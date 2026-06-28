@@ -55,15 +55,15 @@ const pageData = {
     title: "PitchLive - Football Scores",
     apiConfigured: Boolean(apiFootballKey),
     topLeagues: [
-        {name: "FIFA World Cup", slug: "world-cup", icon: "trophy", image: leagueImages["FIFA World Cup"]},
-        {name: "Premier League", slug: "premier-league", icon: "lion", image: leagueImages["Premier League"]},
-        {name: "Champions League", slug: "champions-league", icon: "ball", image: leagueImages["Champions League"]},
-        {name: "LaLiga", slug: "laliga", icon: "laliga", image: leagueImages.LaLiga},
-        {name: "Bundesliga", slug: "bundesliga", icon: "bundesliga", image: leagueImages.Bundesliga},
-        {name: "Serie A", slug: "serie-a", icon: "seriea", image: leagueImages["Serie A"]},
-        {name: "Ligue 1", slug: "ligue-1", icon: "ligue1", image: leagueImages["Ligue 1"]},
-        {name: "Europa League", slug: "europa-league", icon: "europa", image: leagueImages["Europa League"]},
-        {name: "Eredivisie", slug: "eredivisie", icon: "eredivisie", image: leagueImages.Eredivisie},
+        { name: "FIFA World Cup", slug: "world-cup", icon: "trophy", image: leagueImages["FIFA World Cup"] },
+        { name: "Premier League", slug: "premier-league", icon: "lion", image: leagueImages["Premier League"] },
+        { name: "Champions League", slug: "champions-league", icon: "ball", image: leagueImages["Champions League"] },
+        { name: "LaLiga", slug: "laliga", icon: "laliga", image: leagueImages.LaLiga },
+        { name: "Bundesliga", slug: "bundesliga", icon: "bundesliga", image: leagueImages.Bundesliga },
+        { name: "Serie A", slug: "serie-a", icon: "seriea", image: leagueImages["Serie A"] },
+        { name: "Ligue 1", slug: "ligue-1", icon: "ligue1", image: leagueImages["Ligue 1"] },
+        { name: "Europa League", slug: "europa-league", icon: "europa", image: leagueImages["Europa League"] },
+        { name: "Eredivisie", slug: "eredivisie", icon: "eredivisie", image: leagueImages.Eredivisie },
     ],
     transfers: [
         {
@@ -240,10 +240,14 @@ function slugifyTeamName(teamName) {
         .replace(/^-+|-+$/g, "");
 }
 
-function getEuropaLeagueTeamLogo(teamName) {
+function getTeamLogoPath(teamName, folder) {
     const slug = slugifyTeamName(teamName);
 
-    return slug ? `/europa-league/${slug}.png` : null;
+    return slug ? `/${folder}/${slug}.png` : null;
+}
+
+function getEuropaLeagueTeamLogo(teamName) {
+    return getTeamLogoPath(teamName, "europa-league");
 }
 
 function normalizeApiFixture(fixture) {
@@ -359,7 +363,7 @@ function normalizeApiLeagues(fixtures, options = {}) {
 }
 
 async function fetchApiFootballScores(date) {
-    const fixtures = await fetchApiFootballFixtures({date});
+    const fixtures = await fetchApiFootballFixtures({ date });
 
     return normalizeApiLeagues(fixtures);
 }
@@ -406,14 +410,14 @@ async function fetchApiFootballResource(resourcePath, params, options = {}) {
 }
 
 async function fetchApiFootballFixtures(params) {
-    return fetchApiFootballResource("/fixtures", params, {includeTimezone: true});
+    return fetchApiFootballResource("/fixtures", params, { includeTimezone: true });
 }
 
 function isFinishedFixture(fixture) {
     return finishedFixtureStatuses.has(fixture.fixture?.status?.short);
 }
 
-async function fetchApiFootballRecentMatches({days, limit}) {
+async function fetchApiFootballRecentMatches({ days, limit }) {
     const range = getRecentDateRange(days);
     const fixtures = await fetchApiFootballFixtures({
         from: range.from,
@@ -427,7 +431,7 @@ async function fetchApiFootballRecentMatches({days, limit}) {
         .sort((a, b) => getFixtureTimestamp(b) - getFixtureTimestamp(a))
         .slice(0, limit);
 
-    return normalizeApiLeagues(recentFixtures, {groupByDate: true});
+    return normalizeApiLeagues(recentFixtures, { groupByDate: true });
 }
 
 function formatEventMinute(time = {}) {
@@ -522,9 +526,9 @@ async function fetchOptionalApiFootballResource(resourcePath, params) {
 
 async function fetchApiFootballMatchDetails(fixtureId) {
     const [events, lineups, players] = await Promise.all([
-        fetchOptionalApiFootballResource("/fixtures/events", {fixture: fixtureId}),
-        fetchOptionalApiFootballResource("/fixtures/lineups", {fixture: fixtureId}),
-        fetchOptionalApiFootballResource("/fixtures/players", {fixture: fixtureId}),
+        fetchOptionalApiFootballResource("/fixtures/events", { fixture: fixtureId }),
+        fetchOptionalApiFootballResource("/fixtures/lineups", { fixture: fixtureId }),
+        fetchOptionalApiFootballResource("/fixtures/players", { fixture: fixtureId }),
     ]);
 
     return {
@@ -555,15 +559,15 @@ function getWorldCupDayBuckets() {
     const tomorrow = addDays(today, 1);
 
     return [
-        {key: "yesterday", label: "Yesterday", date: formatDateKeyInTimezone(yesterday, WORLD_CUP_TIMEZONE)},
-        {key: "today", label: "Today", date: formatDateKeyInTimezone(today, WORLD_CUP_TIMEZONE)},
-        {key: "tomorrow", label: "Tomorrow", date: formatDateKeyInTimezone(tomorrow, WORLD_CUP_TIMEZONE)},
+        { key: "yesterday", label: "Yesterday", date: formatDateKeyInTimezone(yesterday, WORLD_CUP_TIMEZONE) },
+        { key: "today", label: "Today", date: formatDateKeyInTimezone(today, WORLD_CUP_TIMEZONE) },
+        { key: "tomorrow", label: "Tomorrow", date: formatDateKeyInTimezone(tomorrow, WORLD_CUP_TIMEZONE) },
     ];
 }
 
 async function fetchWorldCupFixturesForBucket(bucket) {
     try {
-        const fixturesForDate = await fetchApiFootballFixtures({date: bucket.date});
+        const fixturesForDate = await fetchApiFootballFixtures({ date: bucket.date });
 
         return fixturesForDate
             .filter((fixture) => fixture.league?.id === WORLD_CUP_LEAGUE_ID)
@@ -682,7 +686,7 @@ async function getRecentScores(options = {}) {
     }
 
     try {
-        const leagues = await fetchApiFootballRecentMatches({days, limit});
+        const leagues = await fetchApiFootballRecentMatches({ days, limit });
 
         return {
             source: "api-football",
@@ -777,28 +781,49 @@ app.get("/api/recent-matches", async (req, res) => {
 });
 
 const leagueDetailSlugs = {
-    "champions-league": {id: 2, name: "Champions League", region: "International"},
-    "europa-league": {id: 3, name: "Europa League", region: "International"},
+    "champions-league": { id: 2, name: "Champions League", region: "International" },
+    "europa-league": { id: 3, name: "Europa League", region: "International" },
 };
 
 function getSampleLeagueTable(slug) {
     const teamsByLeague = {
         "champions-league": [
-            ["Real Madrid", 8, 7, 1, 0, "21-6", "+15", 22],
-            ["Bayern Munich", 8, 7, 0, 1, "19-7", "+12", 21],
-            ["Arsenal", 8, 6, 1, 1, "17-8", "+9", 19],
-            ["Inter", 8, 5, 2, 1, "15-7", "+8", 17],
-            ["Liverpool", 8, 5, 2, 1, "16-9", "+7", 17],
-            ["Barcelona", 8, 5, 1, 2, "18-11", "+7", 16],
-            ["Man City", 8, 5, 1, 2, "14-8", "+6", 16],
-            ["PSG", 8, 4, 3, 1, "13-7", "+6", 15],
-            ["Atletico Madrid", 8, 4, 2, 2, "11-8", "+3", 14],
-            ["Juventus", 8, 4, 2, 2, "10-8", "+2", 14],
-            ["Borussia Dortmund", 8, 4, 1, 3, "13-11", "+2", 13],
-            ["Atalanta", 8, 3, 3, 2, "10-9", "+1", 12],
-            ["Benfica", 8, 3, 2, 3, "9-9", "0", 11],
-            ["Napoli", 8, 3, 1, 4, "9-11", "-2", 10],
-            ["Sporting CP", 8, 2, 3, 3, "8-10", "-2", 9],
+            ["Arsenal", 8, 8, 0, 0, "23-4", "+19", 24, ["W", "D", "D", "W", "D"]],
+            ["Bayern Munich", 8, 7, 0, 1, "22-8", "+14", 21, ["W", "W", "W", "L", "D"]],
+            ["Liverpool", 8, 6, 0, 2, "20-8", "+12", 18, ["W", "L", "W", "L", "L"]],
+            ["Tottenham Hotspur", 8, 5, 2, 1, "17-7", "+10", 17, ["W", "W", "W", "L", "W"]],
+            ["Barcelona", 8, 5, 1, 2, "22-14", "+8", 16, ["W", "D", "W", "L", "W"]],
+            ["Chelsea", 8, 5, 1, 2, "17-10", "+7", 16, ["L", "W", "W", "L", "L"]],
+            ["Sporting CP", 8, 5, 1, 2, "17-11", "+6", 16, ["W", "L", "W", "L", "D"]],
+            ["Manchester City", 8, 5, 1, 2, "15-9", "+6", 16, ["W", "L", "W", "L", "L"]],
+            ["Real Madrid", 8, 5, 0, 3, "21-12", "+9", 15, ["W", "W", "W", "L", "L"]],
+            ["Inter", 8, 5, 0, 3, "15-7", "+8", 15, ["L", "L", "W", "L", "L"]],
+            ["Paris Saint-Germain", 8, 4, 2, 2, "21-11", "+10", 14, ["W", "W", "W", "D", "D"]],
+            ["Newcastle United", 8, 4, 2, 2, "17-7", "+10", 14, ["D", "W", "W", "D", "L"]],
+            ["Juventus", 8, 3, 4, 1, "14-10", "+4", 13, ["W", "W", "D", "L", "W"]],
+            ["Atletico Madrid", 8, 4, 1, 3, "17-15", "+2", 13, ["L", "W", "L", "D", "L"]],
+            ["Atalanta", 8, 4, 1, 3, "10-10", "0", 13, ["L", "L", "W", "L", "L"]],
+            ["Bayer Leverkusen", 8, 3, 3, 2, "13-14", "-1", 12, ["W", "W", "D", "D", "L"]],
+            ["Borussia Dortmund", 8, 3, 2, 3, "19-17", "+2", 11, ["D", "L", "L", "W", "L"]],
+            ["Olympiacos", 8, 3, 2, 3, "10-14", "-4", 11, ["W", "W", "W", "L", "D"]],
+            ["Club Brugge", 8, 3, 1, 4, "15-17", "-2", 10, ["L", "W", "W", "D", "L"]],
+            ["Galatasaray", 8, 3, 1, 4, "9-11", "-2", 10, ["W", "W", "L", "W", "D"]],
+            ["Monaco", 8, 2, 4, 2, "8-14", "-6", 10, ["W", "L", "D", "D", "W"]],
+            ["Qarabag FK", 8, 3, 1, 4, "13-21", "-8", 10, ["L", "W", "L", "L", "L"]],
+            ["Bodo/Glimt", 8, 2, 3, 3, "14-15", "-1", 9, ["W", "W", "W", "W", "L"]],
+            ["Benfica", 8, 3, 0, 5, "10-12", "-2", 9, ["W", "L", "W", "L", "L"]],
+            ["Marseille", 8, 3, 0, 5, "11-14", "-3", 9, ["L", "W", "W", "L", "L"]],
+            ["Pafos FC", 8, 2, 3, 3, "8-11", "-3", 9, ["W", "D", "L", "L", "W"]],
+            ["Union St.Gilloise", 8, 3, 0, 5, "8-17", "-9", 9, ["L", "W", "L", "L", "W"]],
+            ["PSV Eindhoven", 8, 2, 2, 4, "16-16", "0", 8, ["D", "W", "L", "L", "L"]],
+            ["Athletic Club", 8, 2, 2, 4, "9-14", "-5", 8, ["L", "D", "D", "W", "L"]],
+            ["Napoli", 8, 2, 2, 4, "9-15", "-6", 8, ["D", "W", "L", "D", "L"]],
+            ["FC Kobenhavn", 8, 2, 2, 4, "12-21", "-9", 8, ["L", "W", "W", "D", "L"]],
+            ["Ajax", 8, 2, 0, 6, "8-21", "-13", 6, ["L", "L", "W", "W", "L"]],
+            ["Eintracht Frankfurt", 8, 1, 1, 6, "10-21", "-11", 4, ["D", "L", "L", "L", "L"]],
+            ["Slavia Prague", 8, 0, 3, 5, "5-19", "-14", 3, ["L", "D", "L", "L", "L"]],
+            ["Villarreal", 8, 0, 1, 7, "5-18", "-13", 1, ["L", "L", "L", "L", "L"]],
+            ["Kairat Almaty", 8, 0, 1, 7, "7-22", "-15", 1, ["L", "L", "L", "L", "L"]],
         ],
         "europa-league": [
             ["Lyon", 8, 7, 0, 1, "18-5", "+13", 21, ["W", "W", "W", "D", "L"]],
@@ -841,8 +866,8 @@ function getSampleLeagueTable(slug) {
     };
 
     const qualificationZonesBySlug = {
-        "champions-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
-        "europa-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
+        "champions-league": [{ max: 8, zone: "green" }, { max: 24, zone: "blue" }],
+        "europa-league": [{ max: 8, zone: "green" }, { max: 24, zone: "blue" }],
     };
 
     function getQualificationZone(slug, position) {
@@ -853,14 +878,19 @@ function getSampleLeagueTable(slug) {
     }
 
     const teams = teamsByLeague[slug] || [];
+    const logoFoldersBySlug = {
+        "champions-league": "champions-league",
+        "europa-league": "europa-league",
+    };
 
     return teams.map(([team, played, won, drawn, lost, goals, goalDiff, points, form], index) => {
         const position = index + 1;
+        const logoFolder = logoFoldersBySlug[slug];
 
         return {
             position,
             team,
-            teamLogo: slug === "europa-league" ? getEuropaLeagueTeamLogo(team) : null,
+            teamLogo: logoFolder ? getTeamLogoPath(team, logoFolder) : null,
             played,
             won,
             drawn,
@@ -875,32 +905,78 @@ function getSampleLeagueTable(slug) {
 }
 
 function getSampleKnockout(slug) {
-    const roundOf16 = [
-        ["Lyon", 2, "FTC", 3],
-        ["FTC", 2, "Braga", 4],
-        ["PAO", 3, "VPL", 3],
-        ["PAO", 1, "BET", 4],
-        ["DZG", 4, "GNK", 6],
-        ["GNK", 2, "SCF", 5],
-        ["PAO", 1, "CEL", 3],
-        ["CEL", 3, "Lyon", 1],
-    ];
-
-    return {
-        roundOf16,
-        quarterFinals: [
-            ["Braga", 5, "BET", 3],
-            ["SCF", 6, "CEL", 1],
-            ["VFB", 1, "POR", 4],
-            ["CEL2", 2, "VFB2", 4],
-        ],
-        semiFinals: [
-            ["Braga", 3, "SCF", 4],
-            ["POR", 1, "NFO", 2],
-        ],
-        final: ["SCF", 0, "Aston Villa", 3],
-        champion: slug === "champions-league" ? "Real Madrid" : "Aston Villa",
+    const knockoutsBySlug = {
+        "europa-league": {
+            playoff: [
+                ["Lyon", 3, "FC Midtjylland", 1],
+                ["Braga", 4, "Bologna", 2],
+                ["Panathinaikos", 3, "Celta Vigo", 2],
+                ["Dinamo Zagreb", 5, "Fenerbahce", 3],
+                ["Freiburg", 3, "Brann", 0],
+                ["VfB Stuttgart", 4, "Sturm Graz", 1],
+                ["Lille", 3, "Go Ahead Eagles", 2],
+                ["Salzburg", 4, "Basel", 3],
+            ],
+            roundOf16: [
+                ["Lyon", 2, "Ferencvaros", 3],
+                ["Braga", 5, "Real Betis", 3],
+                ["Panathinaikos", 1, "Viktoria Plzen", 3],
+                ["Dinamo Zagreb", 4, "Genk", 6],
+                ["Freiburg", 5, "Celtic", 1],
+                ["VfB Stuttgart", 1, "FC Porto", 4],
+                ["Lille", 2, "Nottingham Forest", 4],
+                ["Salzburg", 1, "Aston Villa", 4],
+            ],
+            quarterFinals: [
+                ["Ferencvaros", 3, "Braga", 4],
+                ["Viktoria Plzen", 1, "Genk", 3],
+                ["Freiburg", 4, "FC Porto", 2],
+                ["Nottingham Forest", 2, "Aston Villa", 3],
+            ],
+            semiFinals: [
+                ["Braga", 1, "Genk", 2],
+                ["Freiburg", 2, "Aston Villa", 4],
+            ],
+            final: ["Genk", 0, "Aston Villa", 3],
+            champion: "Aston Villa",
+        },
+        "champions-league": {
+            playoff: [
+                ["Monaco", 4, "Paris Saint-Germain", 5],
+                ["Galatasaray", 7, "Juventus", 5],
+                ["Benfica", 1, "Real Madrid", 3],
+                ["Borussia Dortmund", 3, "Atalanta", 4],
+                ["Qarabag FK", 3, "Newcastle United", 9],
+                ["Club Brugge", 4, "Atletico Madrid", 7],
+                ["Bodo/Glimt", 5, "Inter", 2],
+                ["Olympiacos", 0, "Bayer Leverkusen", 2],
+            ],
+            roundOf16: [
+                ["Paris Saint-Germain", 8, "Chelsea", 2],
+                ["Galatasaray", 1, "Liverpool", 4],
+                ["Real Madrid", 5, "Manchester City", 1],
+                ["Atalanta", 2, "Bayern Munich", 10],
+                ["Newcastle United", 3, "Barcelona", 8],
+                ["Atletico Madrid", 7, "Tottenham Hotspur", 5],
+                ["Bodo/Glimt", 3, "Sporting CP", 5],
+                ["Bayer Leverkusen", 1, "Arsenal", 3],
+            ],
+            quarterFinals: [
+                ["Paris Saint-Germain", 4, "Liverpool", 0],
+                ["Real Madrid", 4, "Bayern Munich", 6],
+                ["Barcelona", 2, "Atletico Madrid", 3],
+                ["Sporting CP", 0, "Arsenal", 1],
+            ],
+            semiFinals: [
+                ["Paris Saint-Germain", 6, "Bayern Munich", 5],
+                ["Atletico Madrid", 1, "Arsenal", 2],
+            ],
+            final: ["Paris Saint-Germain", 1, "Arsenal", 1],
+            champion: "Paris Saint-Germain",
+        },
     };
+
+    return knockoutsBySlug[slug] || null;
 }
 
 function getLeagueDetail(slug) {
@@ -928,7 +1004,7 @@ app.get("/api/league/:slug", (req, res) => {
     const detail = getLeagueDetail(req.params.slug);
 
     if (!detail) {
-        res.status(404).json({error: "Unknown league"});
+        res.status(404).json({ error: "Unknown league" });
         return;
     }
 
@@ -963,4 +1039,4 @@ if (require.main === module) {
     startServer(port);
 }
 
-module.exports = {app, pageData, getScores, getRecentScores, getWorldCupScores, startServer};
+module.exports = { app, pageData, getScores, getRecentScores, getWorldCupScores, startServer };

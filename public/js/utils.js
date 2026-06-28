@@ -16,7 +16,12 @@ export function safeImageUrl(value) {
     const url = String(value || "").trim();
 
     if (!url) return "";
-    if (url.startsWith("/assets/") || url.startsWith("/europa-league/") || /^https?:\/\//i.test(url)) {
+    if (
+        url.startsWith("/assets/") ||
+        url.startsWith("/europa-league/") ||
+        url.startsWith("/champions-league/") ||
+        /^https?:\/\//i.test(url)
+    ) {
         return escapeHtml(url);
     }
 
@@ -123,17 +128,4 @@ export function getMatchScoreText(match) {
         match.awayScore !== undefined;
 
     return hasScore ? `${match.homeScore} - ${match.awayScore}` : "vs";
-}
-
-export function getTeamRank(teamName) {
-    const knownRanks = {
-        USA: "#17",
-        Australia: "#27",
-        Canada: "#31",
-        Qatar: "#53",
-        Mexico: "#14",
-        "South Korea": "#23",
-    };
-
-    return knownRanks[teamName] || "";
 }
