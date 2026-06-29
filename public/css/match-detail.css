@@ -9,14 +9,14 @@
 
 .is-match-detail .page-shell {
     display: block;
-    width: min(60rem, calc(100% - 0.5rem));
-    margin: 0.4rem auto 2rem;
+    width: min(960px, calc(100% - 8px));
+    margin: 6.4px auto 32px;
 }
 
 .is-league-detail .page-shell {
     display: block;
-    width: min(1278px, calc(100% - 0.5rem));
-    margin: 0.4rem auto 2rem;
+    width: min(1278px, calc(100% - 8px));
+    margin: 6.4px auto 32px;
 }
 
 .is-match-detail .scores-column,
@@ -33,7 +33,7 @@
 
 .match-detail {
     display: grid;
-    gap: 1rem;
+    gap: 16px;
 }
 
 .detail-hero,
@@ -51,18 +51,17 @@
 }
 
 .detail-hero {
-    background:
-            linear-gradient(155deg, rgba(45, 75, 38, 0.82) 0%, rgba(29, 31, 36, 0.98) 42%),
-            linear-gradient(95deg, #172f76 18%, #0b47cb 62%, #1d2f72 100%);
+    background: linear-gradient(155deg, rgba(45, 75, 38, 0.82) 0%, rgba(29, 31, 36, 0.98) 42%),
+    linear-gradient(95deg, #172f76 18%, #0b47cb 62%, #1d2f72 100%);
 }
 
 .detail-hero__top {
     display: grid;
     grid-template-columns: auto auto minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 0.8rem;
-    min-height: 4rem;
-    padding: 0 1.2rem;
+    gap: 12.8px;
+    min-height: 64px;
+    padding: 0 19.2px;
 }
 
 .detail-back,
@@ -75,8 +74,8 @@
 }
 
 .detail-back {
-    width: 2rem;
-    height: 2rem;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: #222326;
     cursor: pointer;
@@ -84,8 +83,8 @@
 
 .detail-back svg,
 .detail-audio svg {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 16.8px;
+    height: 16.8px;
 }
 
 .detail-competition {
@@ -93,42 +92,42 @@
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    gap: 0.7rem;
+    gap: 11.2px;
     font-weight: 950;
 }
 
 .detail-league-logo {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 24px;
+    height: 24px;
     object-fit: contain;
 }
 
 .detail-audio {
     grid-auto-flow: column;
-    gap: 0.45rem;
-    min-width: 4.3rem;
-    min-height: 2rem;
-    padding: 0 0.45rem;
+    gap: 7.2px;
+    min-width: 68.8px;
+    min-height: 32px;
+    padding: 0 7.2px;
     border-radius: 999px;
     background: #2b2b2e;
 }
 
 .detail-audio i {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 16.8px;
+    height: 16.8px;
     border-radius: 50%;
     background: var(--text);
-    box-shadow: 1.3rem 0 0 rgba(255, 255, 255, 0.18);
+    box-shadow: 20.8px 0 0 rgba(255, 255, 255, 0.18);
 }
 
 .detail-follow {
-    min-height: 2rem;
-    padding: 0 1.25rem;
+    min-height: 32px;
+    padding: 0 20px;
     border-radius: 999px;
     background: #ffffff;
     color: #111215;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 13.6px;
     font-weight: 950;
 }
 
@@ -136,40 +135,40 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.9rem 1rem;
-    padding: 0.55rem 1rem 0.95rem;
+    gap: 14.4px 16px;
+    padding: 8.8px 16px 15.2px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.11);
     color: #b6bcc8;
-    font-size: 0.78rem;
+    font-size: 12.48px;
     font-weight: 800;
 }
 
 .detail-meta span {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 6.4px;
     min-width: 0;
 }
 
 .detail-meta svg {
-    width: 0.9rem;
-    height: 0.9rem;
+    width: 14.4px;
+    height: 14.4px;
     color: #7f8794;
 }
 
 .detail-scoreboard {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(6.5rem, auto) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(104px, auto) minmax(0, 1fr);
     align-items: start;
-    gap: clamp(0.8rem, 4vw, 2rem);
-    padding: 1.55rem 2rem 1.1rem;
+    gap: clamp(12.8px, 4vw, 32px);
+    padding: 24.8px 32px 17.6px;
     background: linear-gradient(180deg, rgba(19, 25, 42, 0.72), rgba(24, 24, 25, 0.95));
 }
 
 .detail-team {
     display: grid;
     align-items: center;
-    gap: 0.7rem;
+    gap: 11.2px;
 }
 
 .detail-team--home {
@@ -192,24 +191,24 @@
 .detail-team > span {
     grid-area: copy;
     display: grid;
-    gap: 0.15rem;
+    gap: 2.4px;
 }
 
 .detail-team strong {
     overflow-wrap: anywhere;
-    font-size: clamp(1.15rem, 2.8vw, 1.6rem);
+    font-size: clamp(18.4px, 2.8vw, 25.6px);
     line-height: 1.1;
 }
 
 .detail-team small {
     color: #c2c7d1;
-    font-size: 0.92rem;
+    font-size: 14.72px;
 }
 
 .detail-team-logo {
     display: block;
-    width: 3.2rem;
-    height: 3.2rem;
+    width: 51.2px;
+    height: 51.2px;
     border-radius: 50%;
     object-fit: contain;
     background: #f6f7f8;
@@ -227,10 +226,10 @@
 .detail-events {
     grid-area: events;
     display: grid;
-    gap: 0.15rem;
-    min-height: 2.1rem;
+    gap: 2.4px;
+    min-height: 33.6px;
     color: #cdd3dc;
-    font-size: 0.82rem;
+    font-size: 13.12px;
     font-weight: 800;
 }
 
@@ -241,39 +240,39 @@
 .detail-score {
     display: grid;
     justify-items: center;
-    gap: 0.2rem;
-    min-width: 5.7rem;
+    gap: 3.2px;
+    min-width: 91.2px;
 }
 
 .detail-score strong {
-    font-size: clamp(1.65rem, 4vw, 2rem);
+    font-size: clamp(26.4px, 4vw, 32px);
     line-height: 1;
 }
 
 .detail-score span,
 .detail-score b {
     color: var(--green);
-    font-size: 0.98rem;
+    font-size: 15.68px;
     font-weight: 950;
 }
 
 .detail-score b i {
     display: inline-grid;
-    min-width: 1.35rem;
-    min-height: 1.15rem;
-    margin-left: 0.25rem;
+    min-width: 21.6px;
+    min-height: 18.4px;
+    margin-left: 4px;
     place-items: center;
     border-radius: 999px;
     background: #45464b;
     color: #eff2f4;
     font-style: normal;
-    font-size: 0.72rem;
+    font-size: 11.52px;
 }
 
 .detail-ball {
-    width: 0.72rem;
-    height: 0.72rem;
-    margin-top: 0.55rem;
+    width: 11.52px;
+    height: 11.52px;
+    margin-top: 8.8px;
     border: 2px solid #aeb4bd;
     border-radius: 50%;
 }
@@ -281,9 +280,9 @@
 .detail-tabs {
     display: flex;
     align-items: flex-end;
-    gap: clamp(1.1rem, 4vw, 2.4rem);
-    min-height: 3.3rem;
-    padding: 0 2rem;
+    gap: clamp(17.6px, 4vw, 38.4px);
+    min-height: 52.8px;
+    padding: 0 32px;
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -294,7 +293,7 @@
 
 .detail-tabs button {
     position: relative;
-    min-height: 3.3rem;
+    min-height: 52.8px;
     border: 0;
     background: transparent;
     color: #adb3bd;
@@ -313,7 +312,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    height: 0.22rem;
+    height: 3.52px;
     border-radius: 999px 999px 0 0;
     background: var(--green);
 }

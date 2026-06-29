@@ -1,6 +1,10 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
+const {findUserByEmail, createUser} = require("./users-store");
+const {validateRegistration} = require("./validate-registration");
 
 const envPath = path.join(__dirname, ".env");
 
@@ -50,20 +54,35 @@ const apiFootballLeagueNames = {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({extended: false}));
+
+const sessionSecret = process.env.SESSION_SECRET || "dev-only-secret-change-me";
+
+app.use(
+    session({
+        secret: sessionSecret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        },
+    }),
+);
 
 const pageData = {
     title: "PitchLive - Football Scores",
     apiConfigured: Boolean(apiFootballKey),
     topLeagues: [
-        { name: "FIFA World Cup", slug: "world-cup", icon: "trophy", image: leagueImages["FIFA World Cup"] },
-        { name: "Premier League", slug: "premier-league", icon: "lion", image: leagueImages["Premier League"] },
-        { name: "Champions League", slug: "champions-league", icon: "ball", image: leagueImages["Champions League"] },
-        { name: "LaLiga", slug: "laliga", icon: "laliga", image: leagueImages.LaLiga },
-        { name: "Bundesliga", slug: "bundesliga", icon: "bundesliga", image: leagueImages.Bundesliga },
-        { name: "Serie A", slug: "serie-a", icon: "seriea", image: leagueImages["Serie A"] },
-        { name: "Ligue 1", slug: "ligue-1", icon: "ligue1", image: leagueImages["Ligue 1"] },
-        { name: "Europa League", slug: "europa-league", icon: "europa", image: leagueImages["Europa League"] },
-        { name: "Eredivisie", slug: "eredivisie", icon: "eredivisie", image: leagueImages.Eredivisie },
+        {name: "FIFA World Cup", slug: "world-cup", icon: "trophy", image: leagueImages["FIFA World Cup"]},
+        {name: "Premier League", slug: "premier-league", icon: "lion", image: leagueImages["Premier League"]},
+        {name: "Champions League", slug: "champions-league", icon: "ball", image: leagueImages["Champions League"]},
+        {name: "LaLiga", slug: "laliga", icon: "laliga", image: leagueImages.LaLiga},
+        {name: "Bundesliga", slug: "bundesliga", icon: "bundesliga", image: leagueImages.Bundesliga},
+        {name: "Serie A", slug: "serie-a", icon: "seriea", image: leagueImages["Serie A"]},
+        {name: "Ligue 1", slug: "ligue-1", icon: "ligue1", image: leagueImages["Ligue 1"]},
+        {name: "Europa League", slug: "europa-league", icon: "europa", image: leagueImages["Europa League"]},
+        {name: "Eredivisie", slug: "eredivisie", icon: "eredivisie", image: leagueImages.Eredivisie},
     ],
     transfers: [
         {
@@ -363,7 +382,7 @@ function normalizeApiLeagues(fixtures, options = {}) {
 }
 
 async function fetchApiFootballScores(date) {
-    const fixtures = await fetchApiFootballFixtures({ date });
+    const fixtures = await fetchApiFootballFixtures({date});
 
     return normalizeApiLeagues(fixtures);
 }
@@ -410,14 +429,14 @@ async function fetchApiFootballResource(resourcePath, params, options = {}) {
 }
 
 async function fetchApiFootballFixtures(params) {
-    return fetchApiFootballResource("/fixtures", params, { includeTimezone: true });
+    return fetchApiFootballResource("/fixtures", params, {includeTimezone: true});
 }
 
 function isFinishedFixture(fixture) {
     return finishedFixtureStatuses.has(fixture.fixture?.status?.short);
 }
 
-async function fetchApiFootballRecentMatches({ days, limit }) {
+async function fetchApiFootballRecentMatches({days, limit}) {
     const range = getRecentDateRange(days);
     const fixtures = await fetchApiFootballFixtures({
         from: range.from,
@@ -431,7 +450,7 @@ async function fetchApiFootballRecentMatches({ days, limit }) {
         .sort((a, b) => getFixtureTimestamp(b) - getFixtureTimestamp(a))
         .slice(0, limit);
 
-    return normalizeApiLeagues(recentFixtures, { groupByDate: true });
+    return normalizeApiLeagues(recentFixtures, {groupByDate: true});
 }
 
 function formatEventMinute(time = {}) {
@@ -526,9 +545,9 @@ async function fetchOptionalApiFootballResource(resourcePath, params) {
 
 async function fetchApiFootballMatchDetails(fixtureId) {
     const [events, lineups, players] = await Promise.all([
-        fetchOptionalApiFootballResource("/fixtures/events", { fixture: fixtureId }),
-        fetchOptionalApiFootballResource("/fixtures/lineups", { fixture: fixtureId }),
-        fetchOptionalApiFootballResource("/fixtures/players", { fixture: fixtureId }),
+        fetchOptionalApiFootballResource("/fixtures/events", {fixture: fixtureId}),
+        fetchOptionalApiFootballResource("/fixtures/lineups", {fixture: fixtureId}),
+        fetchOptionalApiFootballResource("/fixtures/players", {fixture: fixtureId}),
     ]);
 
     return {
@@ -559,15 +578,15 @@ function getWorldCupDayBuckets() {
     const tomorrow = addDays(today, 1);
 
     return [
-        { key: "yesterday", label: "Yesterday", date: formatDateKeyInTimezone(yesterday, WORLD_CUP_TIMEZONE) },
-        { key: "today", label: "Today", date: formatDateKeyInTimezone(today, WORLD_CUP_TIMEZONE) },
-        { key: "tomorrow", label: "Tomorrow", date: formatDateKeyInTimezone(tomorrow, WORLD_CUP_TIMEZONE) },
+        {key: "yesterday", label: "Yesterday", date: formatDateKeyInTimezone(yesterday, WORLD_CUP_TIMEZONE)},
+        {key: "today", label: "Today", date: formatDateKeyInTimezone(today, WORLD_CUP_TIMEZONE)},
+        {key: "tomorrow", label: "Tomorrow", date: formatDateKeyInTimezone(tomorrow, WORLD_CUP_TIMEZONE)},
     ];
 }
 
 async function fetchWorldCupFixturesForBucket(bucket) {
     try {
-        const fixturesForDate = await fetchApiFootballFixtures({ date: bucket.date });
+        const fixturesForDate = await fetchApiFootballFixtures({date: bucket.date});
 
         return fixturesForDate
             .filter((fixture) => fixture.league?.id === WORLD_CUP_LEAGUE_ID)
@@ -686,7 +705,7 @@ async function getRecentScores(options = {}) {
     }
 
     try {
-        const leagues = await fetchApiFootballRecentMatches({ days, limit });
+        const leagues = await fetchApiFootballRecentMatches({days, limit});
 
         return {
             source: "api-football",
@@ -714,7 +733,131 @@ async function getRecentScores(options = {}) {
 }
 
 app.get("/", (req, res) => {
-    res.render("index", pageData);
+    res.render("index", {
+        ...pageData,
+        userEmail: req.session?.userEmail || null,
+    });
+});
+
+app.get("/signup", (req, res) => {
+    if (req.session?.userEmail) {
+        res.redirect("/");
+        return;
+    }
+
+    res.render("signup", {
+        title: "Sign up - PitchLive",
+        errors: {},
+        values: {email: ""},
+    });
+});
+
+app.post("/api/auth/register", async (req, res) => {
+    const {email, password, confirmPassword} = req.body || {};
+    const {isValid, errors} = validateRegistration({email, password, confirmPassword});
+
+    if (!isValid) {
+        res.status(400).render("signup", {
+            title: "Sign up - PitchLive",
+            errors,
+            values: {email: email || ""},
+        });
+        return;
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existingUser = findUserByEmail(normalizedEmail);
+
+    if (existingUser) {
+        res.status(409).render("signup", {
+            title: "Sign up - PitchLive",
+            errors: {email: "An account with this email already exists"},
+            values: {email: normalizedEmail},
+        });
+        return;
+    }
+
+    try {
+        const passwordHash = await bcrypt.hash(password, 12);
+        createUser({email: normalizedEmail, passwordHash});
+
+        req.session.userEmail = normalizedEmail;
+        res.redirect("/");
+    } catch (error) {
+        console.error("Registration failed", error);
+        res.status(500).render("signup", {
+            title: "Sign up - PitchLive",
+            errors: {form: "Something went wrong, please try again"},
+            values: {email: normalizedEmail},
+        });
+    }
+});
+
+app.get("/login", (req, res) => {
+    if (req.session?.userEmail) {
+        res.redirect("/");
+        return;
+    }
+
+    res.render("login", {
+        title: "Sign in - PitchLive",
+        errors: {},
+        values: {email: ""},
+    });
+});
+
+app.post("/api/auth/login", async (req, res) => {
+    const {email, password} = req.body || {};
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
+        res.status(400).render("login", {
+            title: "Sign in - PitchLive",
+            errors: {form: "Email and password are required"},
+            values: {email: normalizedEmail},
+        });
+        return;
+    }
+
+    const user = findUserByEmail(normalizedEmail);
+
+    if (!user) {
+        res.status(401).render("login", {
+            title: "Sign in - PitchLive",
+            errors: {form: "Incorrect email or password"},
+            values: {email: normalizedEmail},
+        });
+        return;
+    }
+
+    try {
+        const match = await bcrypt.compare(password, user.passwordHash);
+
+        if (!match) {
+            res.status(401).render("login", {
+                title: "Sign in - PitchLive",
+                errors: {form: "Incorrect email or password"},
+                values: {email: normalizedEmail},
+            });
+            return;
+        }
+
+        req.session.userEmail = normalizedEmail;
+        res.redirect("/");
+    } catch (error) {
+        console.error("Login failed", error);
+        res.status(500).render("login", {
+            title: "Sign in - PitchLive",
+            errors: {form: "Something went wrong, please try again"},
+            values: {email: normalizedEmail},
+        });
+    }
+});
+
+app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/");
+    });
 });
 
 app.get("/api/scores", async (req, res) => {
@@ -781,8 +924,10 @@ app.get("/api/recent-matches", async (req, res) => {
 });
 
 const leagueDetailSlugs = {
-    "champions-league": { id: 2, name: "Champions League", region: "International" },
-    "europa-league": { id: 3, name: "Europa League", region: "International" },
+    "champions-league": {id: 2, name: "Champions League", region: "International"},
+    "europa-league": {id: 3, name: "Europa League", region: "International"},
+    "world-cup": {id: 1, name: "FIFA World Cup", region: "International"}
+
 };
 
 function getSampleLeagueTable(slug) {
@@ -866,8 +1011,8 @@ function getSampleLeagueTable(slug) {
     };
 
     const qualificationZonesBySlug = {
-        "champions-league": [{ max: 8, zone: "green" }, { max: 24, zone: "blue" }],
-        "europa-league": [{ max: 8, zone: "green" }, { max: 24, zone: "blue" }],
+        "champions-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
+        "europa-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
     };
 
     function getQualificationZone(slug, position) {
@@ -986,6 +1131,21 @@ function getLeagueDetail(slug) {
         return null;
     }
 
+    if (slug === "world-cup") {
+        return {
+            source: "static",
+            league: {
+                slug,
+                id: meta.id,
+                name: meta.name,
+                region: meta.region,
+                image: leagueImages[meta.name] || null,
+            },
+            groups: getWorldCupGroups(),
+            knockout: getWorldCupKnockout(),
+        };
+    }
+
     return {
         source: "static",
         league: {
@@ -1004,7 +1164,7 @@ app.get("/api/league/:slug", (req, res) => {
     const detail = getLeagueDetail(req.params.slug);
 
     if (!detail) {
-        res.status(404).json({ error: "Unknown league" });
+        res.status(404).json({error: "Unknown league"});
         return;
     }
 
@@ -1039,4 +1199,4 @@ if (require.main === module) {
     startServer(port);
 }
 
-module.exports = { app, pageData, getScores, getRecentScores, getWorldCupScores, startServer };
+module.exports = {app, pageData, getScores, getRecentScores, getWorldCupScores, startServer};

@@ -1,21 +1,21 @@
 .league-detail {
     display: grid;
-    gap: 1rem;
+    gap: 16px;
 }
 
 .league-detail-hero {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 1.1rem 1.3rem;
+    gap: 13px;
+    padding: 17px 20px;
     border-radius: var(--radius);
     background: var(--panel);
     box-shadow: var(--shadow);
 }
 
 .league-detail-logo {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 44px;
+    height: 44px;
     object-fit: contain;
 }
 
@@ -27,24 +27,24 @@
 
 .league-detail-hero span {
     display: grid;
-    gap: 0.1rem;
+    gap: 1px;
 }
 
 .league-detail-hero strong {
-    font-size: 1.25rem;
+    font-size: 20px;
     font-weight: 950;
 }
 
 .league-detail-hero small {
     color: var(--muted);
-    font-size: 0.82rem;
+    font-size: 13px;
     font-weight: 750;
 }
 
 .league-detail-tabs {
     display: flex;
-    gap: 0.5rem;
-    padding: 0.4rem;
+    gap: 8px;
+    padding: 6px;
     border-radius: var(--radius);
     background: var(--panel);
     box-shadow: var(--shadow);
@@ -52,14 +52,14 @@
 
 .league-detail-tabs button {
     flex: 0 0 auto;
-    min-height: 2.4rem;
-    padding: 0 1.3rem;
+    min-height: 38px;
+    padding: 0 20px;
     border: 0;
     border-radius: 999px;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    font-size: 0.88rem;
+    font-size: 14px;
     font-weight: 850;
 }
 
@@ -80,16 +80,16 @@
 
 .league-table {
     width: 100%;
-    min-width: 38rem;
+    min-width: 608px;
     border-collapse: collapse;
-    font-size: 0.84rem;
+    font-size: 13px;
 }
 
 .league-table thead th {
-    padding: 0.85rem 0.65rem;
+    padding: 13px 10px;
     border-bottom: 1px solid var(--border);
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 11px;
     font-weight: 800;
     text-align: center;
     text-transform: uppercase;
@@ -100,7 +100,7 @@
 }
 
 .league-table tbody td {
-    padding: 0.65rem;
+    padding: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
     font-weight: 750;
@@ -121,24 +121,24 @@
 .table-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1.3rem;
-    padding: 0.9rem 1rem;
+    gap: 8px 20px;
+    padding: 14px 16px;
     border-top: 1px solid var(--border);
 }
 
 .table-legend-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 7px;
     color: var(--muted);
-    font-size: 0.78rem;
+    font-size: 12px;
     font-weight: 800;
 }
 
 .table-legend-dot {
     display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: 9px;
+    height: 9px;
     border-radius: 2px;
 }
 
@@ -158,7 +158,7 @@
 .table-team {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 9px;
     color: var(--text);
     text-align: left;
     font-weight: 900;
@@ -167,8 +167,8 @@
 .table-team-logo {
     display: block;
     flex: 0 0 auto;
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 22px;
+    height: 22px;
     object-fit: contain;
 }
 
@@ -179,17 +179,17 @@
 
 .form-row {
     display: inline-flex;
-    gap: 0.22rem;
+    gap: 3px;
 }
 
 .form-pill {
     display: inline-grid;
-    min-width: 1.3rem;
-    min-height: 1.3rem;
+    min-width: 20px;
+    min-height: 20px;
     place-items: center;
     border-radius: 4px;
     color: #fff;
-    font-size: 0.62rem;
+    font-size: 9px;
     font-weight: 950;
 }
 
@@ -209,15 +209,15 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     align-items: stretch;
-    gap: 0.5rem;
+    gap: 4px;
     height: 600px;
-    padding: 2rem 1rem;
+    padding: 16px 8px;
 }
 
 .bracket-column {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 4px;
     min-width: 0;
     height: 100%;
 }
@@ -238,7 +238,7 @@
 
 .bracket-column-label {
     color: var(--muted);
-    font-size: 0.7rem;
+    font-size: 11px;
     font-weight: 850;
     text-align: center;
     text-transform: uppercase;
@@ -251,10 +251,10 @@
     display: grid;
     align-self: center;
     align-content: space-between;
-    width: 80px;
-    height: 80px;
-    gap: 0.18rem;
-    padding: 0.28rem 0.3rem;
+    width: 72px;
+    height: 68px;
+    gap: 2px;
+    padding: 4px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: var(--panel-soft);
@@ -266,11 +266,15 @@
     border-color: var(--orange);
 }
 
+.bracket--champions-league .bracket-match:hover {
+    border-color: #2f6fed;
+}
+
 .bracket-match-teams {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 0.15rem;
+    gap: 2px;
 }
 
 .bracket-team {
@@ -278,25 +282,27 @@
     flex: 1;
     flex-direction: column;
     align-items: center;
-    gap: 0.1rem;
+    gap: 1px;
     min-width: 0;
-    font-size: 0.56rem;
-    font-weight: 850;
     text-align: center;
 }
 
 .bracket-team span {
     overflow: hidden;
-    max-width: 100%;
+    max-width: 25px;
+    height: 15px;
+    line-height: 15px;
     white-space: nowrap;
     text-overflow: ellipsis;
     letter-spacing: 0.02em;
+    font-size: 8px;
+    font-weight: 850;
 }
 
 .bracket-badge {
     display: block;
-    width: 0.85rem;
-    height: 0.85rem;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
 }
 
@@ -309,11 +315,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.2rem;
-    padding-top: 0.14rem;
+    gap: 3px;
+    padding-top: 2px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     color: var(--text);
-    font-size: 0.66rem;
+    font-size: 10px;
     font-weight: 950;
 }
 
@@ -325,57 +331,58 @@
 .bracket-final {
     display: grid;
     align-content: center;
-    gap: 0.9rem;
+    gap: 14px;
     justify-items: center;
     min-width: 0;
 }
 
 .bracket-final .bracket-match {
     align-self: auto;
-    min-width: 7rem;
+    min-width: 112px;
 }
 
 .bracket-champion {
     display: grid;
-    gap: 0.25rem;
+    gap: 4px;
     justify-items: center;
-    padding: 0.7rem 0.4rem;
+    padding: 11px 6px;
     border-radius: var(--radius);
-    background:
-            radial-gradient(circle at 50% 0%, rgba(255, 215, 93, 0.18), transparent 70%),
-            var(--panel-soft);
+    background: radial-gradient(circle at 50% 0%, rgba(255, 215, 93, 0.18), transparent 70%),
+    var(--panel-soft);
 }
 
 .bracket-champion .bracket-badge {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 35px;
+    height: 35px;
 }
 
 .bracket-trophy {
     display: block;
-    width: 1.3rem;
-    height: 1.7rem;
+    width: 20px;
+    height: 27px;
     border: 2px solid var(--yellow);
     border-top-width: 4px;
     border-radius: 2px 2px 6px 6px;
-    box-shadow: 0 0.55rem 0 -0.3rem var(--yellow);
+    box-shadow: 0 8px 0 -4px var(--yellow);
 }
 
 .bracket-champion strong {
-    font-size: 0.92rem;
+    font-size: 14px;
     font-weight: 950;
+    text-align: center;
+    width: 100%;
 }
 
 .bracket-champion small {
     color: var(--muted);
-    font-size: 0.64rem;
+    font-size: 10px;
     font-weight: 850;
     letter-spacing: 0.05em;
 }
 
 .bracket-empty {
     display: grid;
-    min-height: 8rem;
+    min-height: 128px;
     place-items: center;
     color: var(--muted);
     font-weight: 800;

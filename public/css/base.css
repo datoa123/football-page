@@ -32,8 +32,8 @@ html {
 body {
     min-height: 100vh;
     margin: 0;
-    background: radial-gradient(circle at 45% 16%, rgba(45, 217, 129, 0.12), transparent 20rem),
-    radial-gradient(circle at 61% 8%, rgba(47, 149, 238, 0.12), transparent 19rem),
+    background: radial-gradient(circle at 45% 16%, rgba(45, 217, 129, 0.12), transparent 320px),
+    radial-gradient(circle at 61% 8%, rgba(47, 149, 238, 0.12), transparent 304px),
     var(--bg);
     color: var(--text);
 }
@@ -56,8 +56,8 @@ a {
 
 svg {
     display: block;
-    width: 1rem;
-    height: 1rem;
+    width: 16px;
+    height: 16px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
@@ -76,11 +76,11 @@ svg {
 
 .topbar__inner {
     display: grid;
-    grid-template-columns: 9.5rem minmax(13rem, 21rem) 1fr auto;
+    grid-template-columns: 152px minmax(208px, 336px) 1fr auto;
     align-items: center;
-    gap: 1.5rem;
-    width: min(80rem, calc(100% - 2rem));
-    min-height: 4.75rem;
+    gap: 24px;
+    width: min(1280px, calc(100% - 32px));
+    min-height: 76px;
     margin: 0 auto;
 }
 
@@ -88,23 +88,23 @@ svg {
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    gap: 0.45rem;
-    font-size: 1.5rem;
+    gap: 7.2px;
+    font-size: 24px;
     font-weight: 900;
 }
 
 .brand__mark {
     position: relative;
     display: inline-grid;
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 17px;
+    height: 17px;
     place-items: center;
 }
 
 .brand__mark::after {
     content: "";
-    width: 0.36rem;
-    height: 0.36rem;
+    width: 5.76px;
+    height: 5.76px;
     border: 2px solid var(--text);
     border-radius: 50%;
 }
@@ -118,27 +118,27 @@ svg {
 }
 
 .brand__mark span:nth-child(1) {
-    top: 0.2rem;
-    width: 0.78rem;
+    top: 3.2px;
+    width: 12.48px;
 }
 
 .brand__mark span:nth-child(2) {
-    top: 0.52rem;
-    width: 0.5rem;
+    top: 8.32px;
+    width: 8px;
 }
 
 .brand__mark span:nth-child(3) {
-    bottom: 0.18rem;
-    width: 0.28rem;
+    bottom: 2.88px;
+    width: 4.48px;
 }
 
 .search {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
     min-width: 0;
-    height: 2.45rem;
-    padding: 0 0.95rem;
+    height: 39.2px;
+    padding: 0 15.2px;
     border-radius: 999px;
     background: #2a2a2b;
     color: var(--muted);
@@ -161,13 +161,13 @@ svg {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: clamp(1rem, 3vw, 2.35rem);
+    gap: clamp(16px, 3vw, 37.6px);
     white-space: nowrap;
 }
 
 .nav-links a {
     color: var(--text);
-    font-size: 1.05rem;
+    font-size: 16.8px;
     font-weight: 800;
 }
 
@@ -178,7 +178,7 @@ svg {
 .top-actions {
     display: flex;
     align-items: center;
-    gap: 0.95rem;
+    gap: 15.2px;
 }
 
 .icon-button,
@@ -195,8 +195,8 @@ svg {
 
 .icon-button,
 .store-badge {
-    width: 2rem;
-    height: 2rem;
+    width: 32px;
+    height: 32px;
 }
 
 .store-badge svg {
@@ -207,8 +207,58 @@ svg {
 .store-badge--play span {
     width: 0;
     height: 0;
-    border-top: 0.48rem solid transparent;
-    border-bottom: 0.48rem solid transparent;
-    border-left: 0.78rem solid var(--green);
-    filter: drop-shadow(0.32rem 0 0 #3d7cff) drop-shadow(-0.12rem 0.28rem 0 #ffcf4a);
+    border-top: 7.68px solid transparent;
+    border-bottom: 7.68px solid transparent;
+    border-left: 12.48px solid var(--green);
+    filter: drop-shadow(5.12px 0 0 #3d7cff) drop-shadow(-1.92px 4.48px 0 #ffcf4a);
+}
+
+.auth-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.auth-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.auth-button--login {
+    background: #2b2b2d;
+    color: var(--text);
+}
+
+.auth-button--login:hover {
+    background: #353537;
+}
+
+.auth-button--signup {
+    background: var(--green);
+    color: #06180e;
+}
+
+.auth-button--signup:hover {
+    background: #34e69a;
+}
+
+.auth-user-email {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.auth-actions form {
+    display: inline-flex;
 }

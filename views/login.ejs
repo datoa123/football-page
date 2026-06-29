@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/base.css"/>
+    <link rel="stylesheet" href="/css/auth.css"/>
+</head>
+<body class="auth-body">
+<main class="auth-page">
+    <a class="auth-brand" href="/" aria-label="PitchLive home">
+        <span class="brand__mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span>PitchLive</span>
+    </a>
+
+    <section class="auth-card">
+        <h1>Sign in to PitchLive</h1>
+
+        <% if (errors.form) { %>
+            <p class="auth-form-error"><%= errors.form %></p>
+        <% } %>
+
+        <form class="auth-form" action="/api/auth/login" method="post" novalidate>
+            <label class="auth-field">
+                <span>Email</span>
+                <input
+                        type="email"
+                        name="email"
+                        value="<%= values.email %>"
+                        autocomplete="email"
+                        class="<%= errors.email ? 'has-error' : '' %>"
+                />
+                <% if (errors.email) { %>
+                    <small class="auth-error"><%= errors.email %></small>
+                <% } %>
+            </label>
+
+            <label class="auth-field">
+                <span>Password</span>
+                <input
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        class="<%= errors.password ? 'has-error' : '' %>"
+                />
+                <% if (errors.password) { %>
+                    <small class="auth-error"><%= errors.password %></small>
+                <% } %>
+            </label>
+
+            <button class="auth-submit" type="submit">Sign in</button>
+        </form>
+
+        <p class="auth-footer">Don't have an account? <a href="/signup">Sign up</a></p>
+    </section>
+</main>
+</body>
+</html>

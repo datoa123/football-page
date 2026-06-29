@@ -1,4 +1,4 @@
-import { escapeHtml, safeImageUrl } from "./utils.js";
+import {escapeHtml, safeImageUrl} from "./utils.js";
 
 function renderLeagueLogo(league) {
     const image = safeImageUrl(league.image);
@@ -150,7 +150,7 @@ function computeRoundPositions(roundSizes) {
     const totalUnits = roundSizes[0] * 4;
     const positionsByRound = [];
 
-    positionsByRound[0] = Array.from({ length: roundSizes[0] }, (_, i) => ({
+    positionsByRound[0] = Array.from({length: roundSizes[0]}, (_, i) => ({
         center: i * 4 + 2,
         span: 2,
     }));
@@ -158,15 +158,15 @@ function computeRoundPositions(roundSizes) {
     for (let round = 1; round < roundSizes.length; round += 1) {
         const previous = positionsByRound[round - 1];
 
-        positionsByRound[round] = Array.from({ length: roundSizes[round] }, (_, i) => {
+        positionsByRound[round] = Array.from({length: roundSizes[round]}, (_, i) => {
             const center = (previous[i * 2].center + previous[i * 2 + 1].center) / 2;
             const span = previous[i * 2].span * 2;
 
-            return { center, span };
+            return {center, span};
         });
     }
 
-    return { positionsByRound, totalUnits };
+    return {positionsByRound, totalUnits};
 }
 
 function renderBracketColumn(matches, positions, totalUnits, connectorClass, slug) {
@@ -176,7 +176,7 @@ function renderBracketColumn(matches, positions, totalUnits, connectorClass, slu
                 return "";
             }
 
-            const { center, span } = positions[index];
+            const {center, span} = positions[index];
             const startRow = center - span / 2 + 1;
             const gridRow = `${startRow} / span ${span}`;
 
@@ -210,13 +210,13 @@ function renderKnockout(knockout, slug) {
     const [semiFinalsLeft, semiFinalsRight] = splitInHalf(knockout.semiFinals || []);
 
     const roundSizes = [roundOf16Left.length, quarterFinalsLeft.length, semiFinalsLeft.length];
-    const { positionsByRound, totalUnits } = computeRoundPositions(roundSizes);
+    const {positionsByRound, totalUnits} = computeRoundPositions(roundSizes);
 
     const r16Positions = positionsByRound[0];
     const playoffPositions = r16Positions;
 
     return `
-    <div class="bracket">
+    <div class="bracket bracket--${escapeHtml(slug || "")}">
       <div class="bracket-half">
         ${renderBracketColumn(playoffLeft, playoffPositions, totalUnits, "to-right", slug)}
         ${renderBracketColumn(roundOf16Left, positionsByRound[0], totalUnits, "to-right", slug)}
@@ -244,10 +244,10 @@ function renderKnockout(knockout, slug) {
 }
 
 export function renderLeagueDetail(detail, matchStack, activeTab = "table") {
-    const { league, table, knockout } = detail;
+    const {league, table, knockout} = detail;
     const hasKnockout = Boolean(knockout);
     const tabs = hasKnockout ? ["table", "knockout"] : ["table"];
-    const tabLabels = { table: "Table", knockout: "Knockout" };
+    const tabLabels = {table: "Table", knockout: "Knockout"};
 
     document.body.classList.add("is-league-detail");
 
