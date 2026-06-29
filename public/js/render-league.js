@@ -60,9 +60,9 @@ function renderTableLegend(table) {
     }
 
     const legendLabels = {
-        green: "UEFA Champions League group stage",
-        blue: "Europa League group stage",
-        orange: "Europa Conference League qualifiers",
+        green: "Europa Conference League qualifiers",
+        blue: "UEFA Champions League group stage",
+        orange: "Europa League group stage",
         red: "Relegation",
     };
 
