@@ -867,6 +867,26 @@ app.get("/api/world-cup", async (req, res) => {
     });
 });
 
+app.get("/test-api", async (req, res) => {
+    console.log("API Key:", apiFootballKey);
+
+    const response = await fetch("https://v3.football.api-sports.io/status", {
+        method: "GET",
+        headers: {
+            "x-apisports-key": apiFootballKey,
+            "Accept": "application/json"
+        }
+    });
+
+    console.log("Status:", response.status);
+
+    const text = await response.text();
+
+    console.log(text);
+
+    res.send(text);
+});
+
 app.get("/api/matches/:id/details", async (req, res) => {
     const fixtureId = Number.parseInt(req.params.id, 10);
 
