@@ -118,6 +118,14 @@
     box-shadow: inset 3px 0 0 var(--blue);
 }
 
+.table-row--orange td:first-child {
+    box-shadow: inset 3px 0 0 var(--orange);
+}
+
+.table-row--red td:first-child {
+    box-shadow: inset 3px 0 0 var(--red);
+}
+
 .table-legend {
     display: flex;
     flex-wrap: wrap;
@@ -148,6 +156,14 @@
 
 .table-legend-dot--blue {
     background: var(--blue);
+}
+
+.table-legend-dot--orange {
+    background: var(--orange);
+}
+
+.table-legend-dot--red {
+    background: var(--red);
 }
 
 .table-position {

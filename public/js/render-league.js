@@ -17,13 +17,17 @@ function renderFormPills(form = []) {
 }
 
 function renderTeamLogo(logo) {
-    const image = safeImageUrl(logo);
+    if (!logo) {
+        return "";
+    }
+
+    const image = logo.startsWith("/") ? logo : safeImageUrl(logo);
 
     if (!image) {
         return "";
     }
 
-    return `<img class="table-team-logo" src="${image}" alt="" loading="lazy" />`;
+    return `<img class="table-team-logo" src="${escapeHtml(image)}" alt="" loading="lazy" />`;
 }
 
 function renderTableRow(row) {
@@ -56,8 +60,10 @@ function renderTableLegend(table) {
     }
 
     const legendLabels = {
-        green: "Qualification to 1/8 Finals",
-        blue: "Qualification to 1/16 Finals",
+        green: "UEFA Champions League group stage",
+        blue: "Europa League group stage",
+        orange: "Europa Conference League qualifiers",
+        red: "Relegation",
     };
 
     const items = Array.from(zonesPresent)

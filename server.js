@@ -74,7 +74,6 @@ const pageData = {
     title: "PitchLive - Football Scores",
     apiConfigured: Boolean(apiFootballKey),
     topLeagues: [
-        {name: "FIFA World Cup", slug: "world-cup", icon: "trophy", image: leagueImages["FIFA World Cup"]},
         {name: "Premier League", slug: "premier-league", icon: "lion", image: leagueImages["Premier League"]},
         {name: "Champions League", slug: "champions-league", icon: "ball", image: leagueImages["Champions League"]},
         {name: "LaLiga", slug: "laliga", icon: "laliga", image: leagueImages.LaLiga},
@@ -83,26 +82,6 @@ const pageData = {
         {name: "Ligue 1", slug: "ligue-1", icon: "ligue1", image: leagueImages["Ligue 1"]},
         {name: "Europa League", slug: "europa-league", icon: "europa", image: leagueImages["Europa League"]},
         {name: "Eredivisie", slug: "eredivisie", icon: "eredivisie", image: leagueImages.Eredivisie},
-    ],
-    transfers: [
-        {
-            name: "Jan Paul van Hecke",
-            value: "EUR 60M",
-            avatar: "avatar--one",
-            clubs: ["mini-blue", "mini-navy"],
-        },
-        {
-            name: "Victor Munoz",
-            value: "EUR 40M",
-            avatar: "avatar--two",
-            clubs: ["mini-yellow", "mini-red"],
-        },
-        {
-            name: "Afonso Moreira",
-            value: "EUR 29.5M",
-            avatar: "avatar--three",
-            clubs: ["mini-violet", "mini-maroon"],
-        },
     ],
 };
 
@@ -926,8 +905,12 @@ app.get("/api/recent-matches", async (req, res) => {
 const leagueDetailSlugs = {
     "champions-league": {id: 2, name: "Champions League", region: "International"},
     "europa-league": {id: 3, name: "Europa League", region: "International"},
-    "world-cup": {id: 1, name: "FIFA World Cup", region: "International"}
-
+    "laliga": {id: 140, name: "LaLiga", region: "Spain"},
+    "premier-league": {id: 39, name: "Premier League", region: "England"},
+    "bundesliga": {id: 78, name: "Bundesliga", region: "Germany"},
+    "serie-a": {id: 135, name: "Serie A", region: "Italy"},
+    "ligue-1": {id: 61, name: "Ligue 1", region: "France"},
+    "eredivisie": {id: 88, name: "Eredivisie", region: "Netherlands"},
 };
 
 function getSampleLeagueTable(slug) {
@@ -1008,24 +991,235 @@ function getSampleLeagueTable(slug) {
             ["Malmo FF", 8, 0, 1, 7, "4-15", "-11", 1, ["L", "L", "L", "L", "L"]],
             ["Maccabi Tel Aviv", 8, 0, 1, 7, "2-22", "-20", 1, ["L", "L", "L", "L", "L"]],
         ],
+        "laliga": [
+            ["Barcelona", 38, 31, 1, 6, "95-36", "+59", 94, ["W", "W", "L", "W", "L"]],
+            ["Real Madrid", 38, 27, 5, 6, "77-35", "+42", 86, ["W", "L", "W", "W", "W"]],
+            ["Villarreal", 38, 22, 6, 10, "72-46", "+26", 72, ["W", "D", "L", "L", "W"]],
+            ["Atletico Madrid", 38, 21, 6, 11, "62-44", "+18", 69, ["W", "L", "W", "W", "L"]],
+            ["Real Betis", 38, 15, 15, 8, "59-48", "+11", 60, ["W", "D", "W", "L", "W"]],
+            ["Celta", 38, 14, 12, 12, "53-48", "+5", 54, ["W", "W", "L", "D", "W"]],
+            ["Getafe", 38, 15, 6, 17, "32-38", "-6", 51, ["L", "D", "W", "L", "W"]],
+            ["Rayo Vallecano", 38, 12, 14, 12, "41-44", "-3", 50, ["W", "D", "D", "W", "W"]],
+            ["Valencia", 38, 13, 10, 15, "46-55", "-9", 49, ["L", "W", "D", "W", "W"]],
+            ["Real Sociedad", 38, 13, 16, 14, "59-61", "-2", 46, ["L", "D", "D", "L", "D"]],
+            ["Espanyol", 38, 12, 10, 16, "43-55", "-12", 46, ["L", "L", "W", "W", "D"]],
+            ["Athletic", 38, 13, 6, 19, "43-58", "-15", 45, ["W", "L", "L", "D", "L"]],
+            ["Sevilla", 38, 12, 7, 19, "46-60", "-14", 43, ["W", "W", "W", "L", "L"]],
+            ["Alaves", 38, 11, 10, 17, "44-56", "-12", 43, ["L", "D", "W", "W", "L"]],
+            ["Elche", 38, 10, 13, 15, "49-57", "-8", 43, ["L", "D", "L", "W", "D"]],
+            ["Levante", 38, 11, 9, 18, "47-61", "-14", 42, ["L", "W", "W", "W", "L"]],
+            ["Osasuna", 38, 11, 9, 18, "44-50", "-6", 42, ["L", "L", "L", "L", "L"]],
+            ["Mallorca", 38, 11, 9, 18, "47-57", "-10", 42, ["W", "D", "L", "L", "W"]],
+            ["Girona", 38, 9, 14, 15, "39-55", "-16", 41, ["L", "D", "D", "L", "D"]],
+            ["Real Oviedo", 38, 6, 11, 21, "26-60", "-34", 29, ["L", "D", "L", "L", "L"]],
+        ],
+        "premier-league": [
+            ["Arsenal", 38, 26, 7, 5, "71-27", "+44", 85, ["W", "W", "W", "W", "W"]],
+            ["Man City", 38, 23, 9, 6, "77-35", "+42", 78, ["D", "W", "W", "D", "L"]],
+            ["Man United", 38, 20, 11, 7, "69-50", "+19", 71, ["W", "W", "D", "W", "W"]],
+            ["Aston Villa", 38, 19, 8, 11, "56-49", "+7", 65, ["L", "L", "D", "D", "W"]],
+            ["Liverpool", 38, 17, 9, 12, "63-53", "+10", 60, ["W", "L", "L", "L", "D"]],
+            ["Bournemouth", 38, 13, 18, 7, "58-54", "+4", 57, ["D", "W", "D", "W", "D"]],
+            ["Sunderland", 38, 14, 12, 12, "42-48", "-6", 54, ["L", "D", "D", "W", "W"]],
+            ["Brighton", 38, 14, 11, 13, "52-46", "+6", 53, ["W", "L", "W", "L", "L"]],
+            ["Brentford", 38, 14, 11, 13, "55-52", "+3", 53, ["L", "W", "L", "W", "D"]],
+            ["Chelsea", 38, 14, 10, 14, "58-52", "+6", 52, ["L", "L", "W", "W", "L"]],
+            ["Fulham", 38, 15, 7, 16, "47-51", "-4", 52, ["W", "L", "W", "D", "W"]],
+            ["Newcastle", 38, 14, 7, 17, "53-55", "-2", 49, ["L", "W", "W", "W", "L"]],
+            ["Everton", 38, 13, 10, 15, "47-50", "-3", 49, ["L", "D", "D", "L", "L"]],
+            ["Leeds", 38, 11, 14, 13, "49-56", "-7", 47, ["D", "W", "W", "W", "L"]],
+            ["Palace", 38, 11, 12, 15, "41-51", "-10", 45, ["L", "D", "D", "D", "L"]],
+            ["Nottm Forest", 38, 11, 11, 16, "48-51", "-3", 44, ["W", "W", "L", "W", "D"]],
+            ["Spurs", 38, 10, 11, 17, "48-57", "-9", 41, ["W", "W", "L", "L", "W"]],
+            ["West Ham", 38, 10, 9, 19, "46-65", "-19", 39, ["W", "L", "L", "L", "W"]],
+            ["Burnley", 38, 4, 10, 24, "38-75", "-37", 22, ["L", "L", "L", "L", "D"]],
+            ["Wolves", 38, 3, 11, 24, "27-68", "-41", 20, ["L", "L", "L", "L", "L"]],
+        ],
+        "bundesliga": [
+            ["Bayern", 34, 28, 5, 1, "122-36", "+86", 89, ["W", "W", "D", "D", "W"]],
+            ["Dortmund", 34, 22, 7, 5, "70-34", "+36", 73, ["L", "W", "W", "L", "W"]],
+            ["RB Leipzig", 34, 20, 5, 9, "66-47", "+19", 65, ["W", "W", "L", "W", "L"]],
+            ["VfB Stuttgart", 34, 18, 8, 8, "71-49", "+22", 62, ["L", "D", "D", "W", "D"]],
+            ["Hoffenheim", 34, 18, 7, 9, "65-52", "+13", 61, ["W", "W", "D", "W", "L"]],
+            ["Leverkusen", 34, 17, 8, 9, "68-47", "+21", 59, ["L", "W", "W", "L", "D"]],
+            ["Freiburg", 34, 13, 8, 13, "51-57", "-6", 47, ["W", "L", "W", "L", "W"]],
+            ["Eintracht Frankfurt", 34, 11, 11, 12, "61-65", "-4", 44, ["L", "D", "L", "L", "D"]],
+            ["Augsburg", 34, 12, 7, 15, "45-61", "-16", 43, ["W", "D", "W", "W", "L"]],
+            ["Mainz", 34, 10, 10, 14, "44-53", "-9", 40, ["D", "L", "W", "L", "W"]],
+            ["Union Berlin", 34, 10, 9, 15, "44-58", "-14", 39, ["L", "L", "W", "W", "W"]],
+            ["Monchengladbach", 34, 9, 11, 14, "42-53", "-11", 38, ["D", "D", "W", "W", "W"]],
+            ["Hamburg", 34, 9, 11, 14, "40-54", "-14", 38, ["L", "W", "W", "W", "D"]],
+            ["Koln", 34, 7, 11, 16, "49-63", "-14", 32, ["D", "L", "W", "L", "L"]],
+            ["Werder", 34, 8, 8, 18, "37-60", "-23", 32, ["W", "D", "L", "L", "L"]],
+            ["Wolfsburg", 34, 7, 8, 19, "45-69", "-24", 29, ["W", "D", "L", "L", "W"]],
+            ["Heidenheim", 34, 6, 8, 20, "41-72", "-31", 26, ["L", "W", "D", "W", "L"]],
+            ["St. Pauli", 34, 6, 8, 20, "29-60", "-31", 26, ["D", "L", "L", "L", "L"]],
+        ],
+        "serie-a": [
+            ["Inter", 38, 27, 6, 5, "89-35", "+54", 87, ["D", "W", "W", "D", "D"]],
+            ["Napoli", 38, 23, 7, 8, "58-36", "+22", 76, ["W", "D", "L", "W", "W"]],
+            ["Roma", 38, 23, 4, 11, "59-31", "+28", 73, ["W", "W", "W", "W", "W"]],
+            ["Como", 38, 20, 11, 7, "65-29", "+36", 71, ["W", "D", "W", "W", "W"]],
+            ["Milan", 38, 20, 10, 8, "53-35", "+18", 70, ["D", "L", "L", "W", "L"]],
+            ["Juventus", 38, 19, 12, 7, "61-34", "+27", 69, ["D", "D", "W", "L", "D"]],
+            ["Atalanta", 38, 15, 14, 9, "51-36", "+15", 59, ["L", "D", "W", "L", "D"]],
+            ["Bologna", 38, 16, 8, 14, "49-46", "+3", 56, ["L", "W", "W", "W", "D"]],
+            ["Lazio", 38, 14, 12, 12, "41-40", "+1", 54, ["D", "W", "L", "L", "W"]],
+            ["Udinese", 38, 14, 8, 16, "45-48", "-3", 50, ["D", "W", "W", "L", "L"]],
+            ["Sassuolo", 38, 14, 7, 17, "46-50", "-4", 49, ["D", "W", "L", "L", "L"]],
+            ["Torino", 38, 12, 9, 17, "44-63", "-19", 45, ["L", "L", "W", "L", "D"]],
+            ["Parma", 38, 11, 12, 15, "28-46", "-18", 45, ["W", "L", "L", "L", "W"]],
+            ["Cagliari", 38, 11, 10, 17, "40-53", "-13", 43, ["W", "L", "W", "W", "W"]],
+            ["Fiorentina", 38, 9, 15, 14, "41-50", "-9", 42, ["L", "L", "W", "W", "D"]],
+            ["Genoa", 38, 10, 11, 17, "41-51", "-10", 41, ["L", "D", "D", "L", "L"]],
+            ["Lecce", 38, 10, 8, 20, "28-50", "-22", 38, ["W", "W", "L", "W", "W"]],
+            ["Cremonese", 38, 8, 10, 20, "32-57", "-25", 34, ["L", "L", "W", "W", "L"]],
+            ["Verona", 38, 3, 12, 23, "25-61", "-36", 21, ["D", "D", "L", "D", "L"]],
+            ["Pisa", 38, 2, 12, 24, "26-71", "-45", 18, ["L", "L", "L", "L", "L"]],
+        ],
+        "ligue-1": [
+            ["PSG", 34, 24, 4, 6, "74-29", "+45", 76, ["W", "D", "W", "W", "L"]],
+            ["Lens", 34, 22, 4, 8, "66-35", "+31", 70, ["D", "D", "W", "L", "W"]],
+            ["LOSC", 34, 18, 7, 9, "52-37", "+15", 61, ["D", "W", "D", "W", "L"]],
+            ["OL", 34, 18, 6, 10, "53-40", "+13", 60, ["W", "W", "W", "L", "L"]],
+            ["Marseille", 34, 18, 5, 11, "63-45", "+18", 59, ["L", "D", "L", "W", "W"]],
+            ["Rennes", 34, 17, 8, 9, "59-50", "+9", 59, ["W", "W", "L", "W", "L"]],
+            ["Monaco", 34, 16, 6, 12, "60-54", "+6", 54, ["D", "D", "W", "L", "L"]],
+            ["Strasbourg", 34, 15, 8, 11, "58-47", "+11", 53, ["W", "L", "D", "W", "W"]],
+            ["Toulouse", 34, 12, 9, 13, "47-46", "+1", 45, ["L", "L", "D", "W", "W"]],
+            ["Lorient", 34, 11, 12, 11, "48-51", "-3", 45, ["W", "L", "D", "W", "L"]],
+            ["Paris FC", 34, 11, 11, 12, "47-50", "-3", 44, ["W", "L", "W", "L", "W"]],
+            ["Brest", 34, 10, 9, 15, "43-55", "-12", 39, ["D", "L", "L", "L", "D"]],
+            ["Angers", 34, 9, 9, 16, "29-48", "-19", 36, ["D", "L", "L", "D", "D"]],
+            ["Le Havre", 34, 7, 14, 13, "32-44", "-12", 35, ["D", "D", "L", "W", "W"]],
+            ["Auxerre", 34, 8, 10, 16, "34-44", "-10", 34, ["D", "L", "W", "W", "W"]],
+            ["Nice", 34, 7, 11, 16, "37-60", "-23", 32, ["D", "D", "L", "L", "D"]],
+            ["Nantes", 34, 5, 9, 20, "29-52", "-23", 24, ["D", "L", "W", "L", "L"]],
+            ["Metz", 34, 3, 8, 23, "32-76", "-44", 17, ["L", "D", "L", "L", "D"]],
+        ],
+        "eredivisie": [
+            ["PSV", 34, 27, 3, 4, "101-45", "+56", 84, ["W", "W", "D", "W", "W"]],
+            ["Feyenoord", 34, 19, 8, 7, "70-44", "+26", 65, ["D", "W", "W", "D", "W"]],
+            ["NEC", 34, 16, 11, 7, "77-53", "+24", 59, ["D", "D", "D", "L", "W"]],
+            ["Twente", 34, 15, 13, 6, "59-40", "+19", 58, ["W", "D", "D", "D", "L"]],
+            ["Ajax", 34, 14, 14, 6, "62-41", "+21", 56, ["W", "W", "L", "L", "D"]],
+            ["Utrecht", 34, 15, 8, 11, "55-42", "+13", 53, ["W", "L", "W", "W", "W"]],
+            ["AZ Alkmaar", 34, 14, 10, 10, "58-51", "+7", 52, ["W", "D", "D", "D", "D"]],
+            ["Heerenveen", 34, 14, 9, 11, "57-53", "+4", 51, ["L", "W", "W", "L", "D"]],
+            ["Groningen", 34, 14, 6, 14, "49-45", "+4", 48, ["D", "L", "L", "W", "W"]],
+            ["Sparta Rotterdam", 34, 12, 7, 15, "40-62", "-22", 43, ["L", "L", "W", "L", "L"]],
+            ["Fortuna Sittard", 34, 11, 6, 17, "49-63", "-14", 39, ["D", "L", "L", "W", "L"]],
+            ["Go Ahead Eagles", 34, 8, 14, 12, "54-53", "+1", 38, ["D", "D", "D", "L", "L"]],
+            ["Excelsior", 34, 10, 8, 16, "43-56", "-13", 38, ["D", "W", "W", "W", "W"]],
+            ["Telstar", 34, 9, 10, 15, "49-55", "-6", 37, ["L", "W", "W", "W", "W"]],
+            ["PEC Zwolle", 34, 9, 10, 15, "44-71", "-27", 37, ["D", "L", "W", "L", "L"]],
+            ["FC Volendam", 34, 8, 8, 18, "35-55", "-20", 32, ["L", "W", "W", "D", "L"]],
+            ["NAC", 34, 6, 11, 17, "35-58", "-23", 29, ["D", "D", "D", "W", "D"]],
+            ["Heracles", 34, 5, 4, 25, "35-85", "-50", 19, ["L", "L", "L", "L", "L"]],
+        ],
     };
 
+    const teams = teamsByLeague[slug];
+
     const qualificationZonesBySlug = {
-        "champions-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
-        "europa-league": [{max: 8, zone: "green"}, {max: 24, zone: "blue"}],
+        "champions-league": [
+            {max: 8, zone: "green"},
+            {max: 24, zone: "blue"},
+        ],
+        "europa-league": [
+            {max: 8, zone: "green"},
+            {max: 24, zone: "blue"},
+        ],
+        "laliga": [
+            {max: 5, zone: "blue"},
+            {max: 7, zone: "orange"},
+            {max: 8, zone: "green"},
+            {min: 18, zone: "red"},
+        ],
+        "premier-league": [
+            {max: 5, zone: "blue"},
+            {max: 7, zone: "orange"},
+            {max: 8, zone: "green"},
+            {min: 18, zone: "red"},
+        ],
+        "bundesliga": [
+            {max: 4, zone: "blue"},
+            {max: 6, zone: "orange"},
+            {max: 7, zone: "green"},
+            {min: 17, zone: "red"},
+        ],
+        "serie-a": [
+            {max: 4, zone: "blue"},
+            {max: 6, zone: "orange"},
+            {max: 7, zone: "green"},
+            {min: 18, zone: "red"},
+        ],
+        "ligue-1": [
+            {max: 3, zone: "blue"},
+            {max: 5, zone: "orange"},
+            {max: 6, zone: "green"},
+            {min: 17, zone: "red"},
+        ],
+        "eredivisie": [
+            {max: 2, zone: "blue"},
+            {max: 3, zone: "orange"},
+            {max: 8, zone: "green"},
+            {min: 17, zone: "red"},
+        ],
     };
 
     function getQualificationZone(slug, position) {
         const zones = qualificationZonesBySlug[slug] || [];
-        const match = zones.find((zone) => position <= zone.max);
 
-        return match ? match.zone : null;
+        for (const zone of zones) {
+            if (zone.max !== undefined && position <= zone.max) {
+                return zone.zone;
+            }
+
+            if (zone.min !== undefined && position >= zone.min) {
+                return zone.zone;
+            }
+        }
+
+        return null;
     }
 
-    const teams = teamsByLeague[slug] || [];
+    if (slug === "world-cup") {
+        const groupsMap = new Map();
+        teams.forEach((team) => {
+            if (!groupsMap.has(team.group)) {
+                groupsMap.set(team.group, []);
+            }
+            groupsMap.get(team.group).push(team);
+        });
+        return Array.from(groupsMap.entries()).map(([groupLetter, groupTeams]) => ({
+            groupName: `Group ${groupLetter}`,
+            rows: groupTeams.map((team, index) => ({
+                position: index + 1,
+                team: team.team,
+                teamLogo: null,
+                played: team.played,
+                won: team.won,
+                drawn: team.drawn,
+                lost: team.lost,
+                goals: team.goals,
+                goalDiff: team.goalDiff,
+                points: team.points,
+                form: team.form,
+                qualification: index === 0 ? "green" : index === 1 ? "blue" : null,
+            })),
+        }));
+    }
+
     const logoFoldersBySlug = {
         "champions-league": "champions-league",
         "europa-league": "europa-league",
+        "laliga": "laliga",
+        "premier-league": "premier-league",
+        "bundesliga": "bundesliga",
+        "serie-a": "serie-a",
+        "ligue-1": "ligue-1",
+        "eredivisie": "eredivisie",
     };
 
     return teams.map(([team, played, won, drawn, lost, goals, goalDiff, points, form], index) => {
@@ -1141,8 +1335,8 @@ function getLeagueDetail(slug) {
                 region: meta.region,
                 image: leagueImages[meta.name] || null,
             },
-            groups: getWorldCupGroups(),
-            knockout: getWorldCupKnockout(),
+            groups: getSampleLeagueTable("world-cup"),
+            knockout: getSampleKnockout("world-cup"),
         };
     }
 
