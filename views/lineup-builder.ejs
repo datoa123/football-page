@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Build Your XI - PitchLive</title>
+    <link rel="stylesheet" href="/css/fantasy.css">
+</head>
+<body class="xi-page">
+
+<div class="xi-header">
+    <a href="/">← Back</a>
+    <span class="sep">/</span>
+    <h1>Build Your XI</h1>
+</div>
+
+<div class="xi-layout">
+    <div class="xi-panel">
+        <h2>Formation</h2>
+        <div class="formation-grid" id="formationPicker">
+            <button class="formation-btn active" data-formation="4-3-3">4-3-3</button>
+            <button class="formation-btn" data-formation="4-4-2">4-4-2</button>
+            <button class="formation-btn" data-formation="4-2-3-1">4-2-3-1</button>
+            <button class="formation-btn" data-formation="3-5-2">3-5-2</button>
+            <button class="formation-btn" data-formation="3-4-3">3-4-3</button>
+            <button class="formation-btn" data-formation="5-3-2">5-3-2</button>
+        </div>
+
+        <h2>XI Summary</h2>
+        <div class="xi-list" id="xiList"></div>
+
+        <div class="xi-actions">
+            <button class="btn-save" id="saveBtn">Save Lineup</button>
+            <button class="btn-clear" id="clearBtn">Clear All</button>
+        </div>
+    </div>
+
+    <div class="xi-pitch-wrap">
+        <div class="pitch" id="pitch">
+            <div class="pitch-halfway"></div>
+            <div class="pitch-center-circle"></div>
+            <div class="pitch-penalty-top"></div>
+            <div class="pitch-penalty-bot"></div>
+        </div>
+    </div>
+
+    <div class="xi-panel" id="rightPanel">
+        <h2>Squad Stats</h2>
+        <div id="squadStats" class="squad-stats">
+            Pick your players to see squad stats.
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">
+                <h3>Select Player</h3>
+                <span class="modal-pos pos-badge" id="modalPosBadge"></span>
+            </div>
+
+            <button class="modal-close" id="modalClose">×</button>
+        </div>
+
+        <div class="modal-search-wrap">
+            <input
+                    class="modal-search"
+                    id="playerSearch"
+                    type="text"
+                    placeholder="Search player name or team…"
+                    autocomplete="off"
+            />
+        </div>
+
+        <div class="modal-filters" id="modalFilters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="1">GK</button>
+            <button class="filter-btn" data-filter="2">DEF</button>
+            <button class="filter-btn" data-filter="3">MID</button>
+            <button class="filter-btn" data-filter="4">FWD</button>
+        </div>
+
+        <div class="modal-players" id="playerList">
+            <div class="modal-loading">
+                <div class="spinner"></div>
+                Loading players…
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/lineup-builder.js"></script>
+</body>
+</html>

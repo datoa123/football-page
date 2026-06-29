@@ -718,6 +718,14 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get('/lineup-builder', (req, res) => {
+    res.render('lineup-builder', {
+        title: 'Build Your XI - PitchLive',
+        userEmail: req.session?.userEmail || null,
+    });
+});
+
+
 app.get("/signup", (req, res) => {
     if (req.session?.userEmail) {
         res.redirect("/");
@@ -901,6 +909,64 @@ app.get("/api/recent-matches", async (req, res) => {
         ...scores,
     });
 });
+
+app.get('/api/fpl/players', async (req, res) => {
+    const FPL_URL = 'https://fantasy.premierleague.com/api/bootstrap-static/';
+    const cacheKey = '__fpl_bootstrap__';
+    const TTL = 5 * 60 * 1000; // 5-minute cache
+
+    const cached = apiFootballCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+        return res.json(cached.response);
+    }
+
+    try {
+        const response = await fetch(FPL_URL, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; PitchLive/1.0)',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`FPL API responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const result = {
+            players: (data.elements || []).map((p) => ({
+                id: p.id,
+                code: p.code,
+                first_name: p.first_name,
+                second_name: p.second_name,
+                web_name: p.web_name,
+                team: p.team,
+                element_type: p.element_type,   // 1=GK 2=DEF 3=MID 4=FWD
+                total_points: p.total_points,
+                now_cost: p.now_cost,        // divide by 10 for £m
+                squad_number: p.squad_number,
+                status: p.status,
+            })),
+            teams: (data.teams || []).map((t) => ({
+                id: t.id,
+                name: t.name,
+                short_name: t.short_name,
+                code: t.code,
+            })),
+        };
+
+        apiFootballCache.set(cacheKey, {
+            expiresAt: Date.now() + TTL,
+            response: result,
+        });
+
+        res.json(result);
+    } catch (error) {
+        console.error('FPL proxy error:', error);
+        res.status(502).json({error: 'Unable to load FPL data right now', players: [], teams: []});
+    }
+});
+
 
 const leagueDetailSlugs = {
     "champions-league": {id: 2, name: "Champions League", region: "International"},
