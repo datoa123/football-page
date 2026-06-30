@@ -36,7 +36,7 @@ npm run dev
 
 Email: test@example.com
 
-Password: test123
+Password: test1234
 
 API
 

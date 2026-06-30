@@ -5,6 +5,11 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const {findUserByEmail, createUser} = require("./users-store");
 const {validateRegistration} = require("./validate-registration");
+const {createLeagueRoutes} = require("./routes/leagues");
+const {getLiveStandings} = require("./services/standings-provider");
+const {createAuthRoutes} = require("./routes/auth");
+const {connectToDatabase} = require("./db");
+const {createLineupRoutes} = require("./routes/lineup");
 
 const envPath = path.join(__dirname, ".env");
 
@@ -55,6 +60,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended: false}));
+app.use(express.json());
 
 const sessionSecret = process.env.SESSION_SECRET || "dev-only-secret-change-me";
 
@@ -603,38 +609,53 @@ function getFallbackWorldCupDays(buckets) {
     }));
 }
 
+let worldCupScoresCache = null;
+const worldCupScoresCacheTtlMs = 3 * 60 * 1000;
+
 async function getWorldCupScores() {
+    if (worldCupScoresCache && worldCupScoresCache.expiresAt > Date.now()) {
+        return worldCupScoresCache.data;
+    }
+
     const buckets = getWorldCupDayBuckets();
+    let result;
 
     if (!apiFootballKey) {
-        return {
+        result = {
             source: "static",
             providerConfigured: false,
             mode: "world-cup",
             days: getFallbackWorldCupDays(buckets),
         };
+    } else {
+        try {
+            const bucketsWithFixtures = await fetchWorldCupFixtures(buckets);
+
+            result = {
+                source: "api-football",
+                providerConfigured: true,
+                mode: "world-cup",
+                days: groupWorldCupFixturesByDay(bucketsWithFixtures),
+            };
+        } catch (error) {
+            console.error(error);
+
+            result = {
+                source: "static",
+                providerConfigured: true,
+                mode: "world-cup",
+                error: "Unable to load World Cup scores right now",
+                days: getFallbackWorldCupDays(buckets),
+            };
+        }
     }
 
-    try {
-        const bucketsWithFixtures = await fetchWorldCupFixtures(buckets);
+    worldCupScoresCache = {
+        expiresAt: Date.now() + worldCupScoresCacheTtlMs,
+        data: result,
+    };
 
-        return {
-            source: "api-football",
-            providerConfigured: true,
-            mode: "world-cup",
-            days: groupWorldCupFixturesByDay(bucketsWithFixtures),
-        };
-    } catch (error) {
-        console.error(error);
-
-        return {
-            source: "static",
-            providerConfigured: true,
-            mode: "world-cup",
-            error: "Unable to load World Cup scores right now",
-            days: getFallbackWorldCupDays(buckets),
-        };
-    }
+    return result;
 }
 
 async function getScores(date) {
@@ -715,135 +736,6 @@ app.get("/", (req, res) => {
     res.render("index", {
         ...pageData,
         userEmail: req.session?.userEmail || null,
-    });
-});
-
-app.get('/lineup-builder', (req, res) => {
-    res.render('lineup-builder', {
-        title: 'Build Your XI - PitchLive',
-        userEmail: req.session?.userEmail || null,
-    });
-});
-
-
-app.get("/signup", (req, res) => {
-    if (req.session?.userEmail) {
-        res.redirect("/");
-        return;
-    }
-
-    res.render("signup", {
-        title: "Sign up - PitchLive",
-        errors: {},
-        values: {email: ""},
-    });
-});
-
-app.post("/api/auth/register", async (req, res) => {
-    const {email, password, confirmPassword} = req.body || {};
-    const {isValid, errors} = validateRegistration({email, password, confirmPassword});
-
-    if (!isValid) {
-        res.status(400).render("signup", {
-            title: "Sign up - PitchLive",
-            errors,
-            values: {email: email || ""},
-        });
-        return;
-    }
-
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const existingUser = findUserByEmail(normalizedEmail);
-
-    if (existingUser) {
-        res.status(409).render("signup", {
-            title: "Sign up - PitchLive",
-            errors: {email: "An account with this email already exists"},
-            values: {email: normalizedEmail},
-        });
-        return;
-    }
-
-    try {
-        const passwordHash = await bcrypt.hash(password, 12);
-        createUser({email: normalizedEmail, passwordHash});
-
-        req.session.userEmail = normalizedEmail;
-        res.redirect("/");
-    } catch (error) {
-        console.error("Registration failed", error);
-        res.status(500).render("signup", {
-            title: "Sign up - PitchLive",
-            errors: {form: "Something went wrong, please try again"},
-            values: {email: normalizedEmail},
-        });
-    }
-});
-
-app.get("/login", (req, res) => {
-    if (req.session?.userEmail) {
-        res.redirect("/");
-        return;
-    }
-
-    res.render("login", {
-        title: "Sign in - PitchLive",
-        errors: {},
-        values: {email: ""},
-    });
-});
-
-app.post("/api/auth/login", async (req, res) => {
-    const {email, password} = req.body || {};
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-
-    if (!normalizedEmail || !password) {
-        res.status(400).render("login", {
-            title: "Sign in - PitchLive",
-            errors: {form: "Email and password are required"},
-            values: {email: normalizedEmail},
-        });
-        return;
-    }
-
-    const user = findUserByEmail(normalizedEmail);
-
-    if (!user) {
-        res.status(401).render("login", {
-            title: "Sign in - PitchLive",
-            errors: {form: "Incorrect email or password"},
-            values: {email: normalizedEmail},
-        });
-        return;
-    }
-
-    try {
-        const match = await bcrypt.compare(password, user.passwordHash);
-
-        if (!match) {
-            res.status(401).render("login", {
-                title: "Sign in - PitchLive",
-                errors: {form: "Incorrect email or password"},
-                values: {email: normalizedEmail},
-            });
-            return;
-        }
-
-        req.session.userEmail = normalizedEmail;
-        res.redirect("/");
-    } catch (error) {
-        console.error("Login failed", error);
-        res.status(500).render("login", {
-            title: "Sign in - PitchLive",
-            errors: {form: "Something went wrong, please try again"},
-            values: {email: normalizedEmail},
-        });
-    }
-});
-
-app.post("/api/auth/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/");
     });
 });
 
@@ -999,46 +891,71 @@ const leagueDetailSlugs = {
     "eredivisie": {id: 88, name: "Eredivisie", region: "Netherlands"},
 };
 
+const qualificationZonesBySlug = {
+    "champions-league": [
+        {max: 8, zone: "green"},
+        {max: 24, zone: "blue"},
+    ],
+    "europa-league": [
+        {max: 8, zone: "green"},
+        {max: 24, zone: "blue"},
+    ],
+    "laliga": [
+        {max: 5, zone: "blue"},
+        {max: 7, zone: "orange"},
+        {max: 8, zone: "green"},
+        {min: 18, zone: "red"},
+    ],
+    "premier-league": [
+        {max: 5, zone: "blue"},
+        {max: 7, zone: "orange"},
+        {max: 8, zone: "green"},
+        {min: 18, zone: "red"},
+    ],
+    "bundesliga": [
+        {max: 4, zone: "blue"},
+        {max: 6, zone: "orange"},
+        {max: 7, zone: "green"},
+        {min: 17, zone: "red"},
+    ],
+    "serie-a": [
+        {max: 4, zone: "blue"},
+        {max: 6, zone: "orange"},
+        {max: 7, zone: "green"},
+        {min: 18, zone: "red"},
+    ],
+    "ligue-1": [
+        {max: 3, zone: "blue"},
+        {max: 5, zone: "orange"},
+        {max: 6, zone: "green"},
+        {min: 17, zone: "red"},
+    ],
+    "eredivisie": [
+        {max: 2, zone: "blue"},
+        {max: 3, zone: "orange"},
+        {max: 8, zone: "green"},
+        {min: 17, zone: "red"},
+    ],
+};
+
+function getQualificationZoneForSlug(slug, position) {
+    const zones = qualificationZonesBySlug[slug] || [];
+
+    for (const zone of zones) {
+        if (zone.max !== undefined && position <= zone.max) {
+            return zone.zone;
+        }
+
+        if (zone.min !== undefined && position >= zone.min) {
+            return zone.zone;
+        }
+    }
+
+    return null;
+}
+
 function getSampleLeagueTable(slug) {
     const teamsByLeague = {
-        "champions-league": [
-            ["Arsenal", 8, 8, 0, 0, "23-4", "+19", 24, ["W", "D", "D", "W", "D"]],
-            ["Bayern Munich", 8, 7, 0, 1, "22-8", "+14", 21, ["W", "W", "W", "L", "D"]],
-            ["Liverpool", 8, 6, 0, 2, "20-8", "+12", 18, ["W", "L", "W", "L", "L"]],
-            ["Tottenham Hotspur", 8, 5, 2, 1, "17-7", "+10", 17, ["W", "W", "W", "L", "W"]],
-            ["Barcelona", 8, 5, 1, 2, "22-14", "+8", 16, ["W", "D", "W", "L", "W"]],
-            ["Chelsea", 8, 5, 1, 2, "17-10", "+7", 16, ["L", "W", "W", "L", "L"]],
-            ["Sporting CP", 8, 5, 1, 2, "17-11", "+6", 16, ["W", "L", "W", "L", "D"]],
-            ["Manchester City", 8, 5, 1, 2, "15-9", "+6", 16, ["W", "L", "W", "L", "L"]],
-            ["Real Madrid", 8, 5, 0, 3, "21-12", "+9", 15, ["W", "W", "W", "L", "L"]],
-            ["Inter", 8, 5, 0, 3, "15-7", "+8", 15, ["L", "L", "W", "L", "L"]],
-            ["Paris Saint-Germain", 8, 4, 2, 2, "21-11", "+10", 14, ["W", "W", "W", "D", "D"]],
-            ["Newcastle United", 8, 4, 2, 2, "17-7", "+10", 14, ["D", "W", "W", "D", "L"]],
-            ["Juventus", 8, 3, 4, 1, "14-10", "+4", 13, ["W", "W", "D", "L", "W"]],
-            ["Atletico Madrid", 8, 4, 1, 3, "17-15", "+2", 13, ["L", "W", "L", "D", "L"]],
-            ["Atalanta", 8, 4, 1, 3, "10-10", "0", 13, ["L", "L", "W", "L", "L"]],
-            ["Bayer Leverkusen", 8, 3, 3, 2, "13-14", "-1", 12, ["W", "W", "D", "D", "L"]],
-            ["Borussia Dortmund", 8, 3, 2, 3, "19-17", "+2", 11, ["D", "L", "L", "W", "L"]],
-            ["Olympiacos", 8, 3, 2, 3, "10-14", "-4", 11, ["W", "W", "W", "L", "D"]],
-            ["Club Brugge", 8, 3, 1, 4, "15-17", "-2", 10, ["L", "W", "W", "D", "L"]],
-            ["Galatasaray", 8, 3, 1, 4, "9-11", "-2", 10, ["W", "W", "L", "W", "D"]],
-            ["Monaco", 8, 2, 4, 2, "8-14", "-6", 10, ["W", "L", "D", "D", "W"]],
-            ["Qarabag FK", 8, 3, 1, 4, "13-21", "-8", 10, ["L", "W", "L", "L", "L"]],
-            ["Bodo/Glimt", 8, 2, 3, 3, "14-15", "-1", 9, ["W", "W", "W", "W", "L"]],
-            ["Benfica", 8, 3, 0, 5, "10-12", "-2", 9, ["W", "L", "W", "L", "L"]],
-            ["Marseille", 8, 3, 0, 5, "11-14", "-3", 9, ["L", "W", "W", "L", "L"]],
-            ["Pafos FC", 8, 2, 3, 3, "8-11", "-3", 9, ["W", "D", "L", "L", "W"]],
-            ["Union St.Gilloise", 8, 3, 0, 5, "8-17", "-9", 9, ["L", "W", "L", "L", "W"]],
-            ["PSV Eindhoven", 8, 2, 2, 4, "16-16", "0", 8, ["D", "W", "L", "L", "L"]],
-            ["Athletic Club", 8, 2, 2, 4, "9-14", "-5", 8, ["L", "D", "D", "W", "L"]],
-            ["Napoli", 8, 2, 2, 4, "9-15", "-6", 8, ["D", "W", "L", "D", "L"]],
-            ["FC Kobenhavn", 8, 2, 2, 4, "12-21", "-9", 8, ["L", "W", "W", "D", "L"]],
-            ["Ajax", 8, 2, 0, 6, "8-21", "-13", 6, ["L", "L", "W", "W", "L"]],
-            ["Eintracht Frankfurt", 8, 1, 1, 6, "10-21", "-11", 4, ["D", "L", "L", "L", "L"]],
-            ["Slavia Prague", 8, 0, 3, 5, "5-19", "-14", 3, ["L", "D", "L", "L", "L"]],
-            ["Villarreal", 8, 0, 1, 7, "5-18", "-13", 1, ["L", "L", "L", "L", "L"]],
-            ["Kairat Almaty", 8, 0, 1, 7, "7-22", "-15", 1, ["L", "L", "L", "L", "L"]],
-        ],
         "europa-league": [
             ["Lyon", 8, 7, 0, 1, "18-5", "+13", 21, ["W", "W", "W", "D", "L"]],
             ["Aston Villa", 8, 7, 0, 1, "14-6", "+8", 21, ["W", "W", "L", "W", "W"]],
@@ -1077,112 +994,6 @@ function getSampleLeagueTable(slug) {
             ["Malmo FF", 8, 0, 1, 7, "4-15", "-11", 1, ["L", "L", "L", "L", "L"]],
             ["Maccabi Tel Aviv", 8, 0, 1, 7, "2-22", "-20", 1, ["L", "L", "L", "L", "L"]],
         ],
-        "laliga": [
-            ["Barcelona", 38, 31, 1, 6, "95-36", "+59", 94, ["W", "W", "L", "W", "L"]],
-            ["Real Madrid", 38, 27, 5, 6, "77-35", "+42", 86, ["W", "L", "W", "W", "W"]],
-            ["Villarreal", 38, 22, 6, 10, "72-46", "+26", 72, ["W", "D", "L", "L", "W"]],
-            ["Atletico Madrid", 38, 21, 6, 11, "62-44", "+18", 69, ["W", "L", "W", "W", "L"]],
-            ["Real Betis", 38, 15, 15, 8, "59-48", "+11", 60, ["W", "D", "W", "L", "W"]],
-            ["Celta", 38, 14, 12, 12, "53-48", "+5", 54, ["W", "W", "L", "D", "W"]],
-            ["Getafe", 38, 15, 6, 17, "32-38", "-6", 51, ["L", "D", "W", "L", "W"]],
-            ["Rayo Vallecano", 38, 12, 14, 12, "41-44", "-3", 50, ["W", "D", "D", "W", "W"]],
-            ["Valencia", 38, 13, 10, 15, "46-55", "-9", 49, ["L", "W", "D", "W", "W"]],
-            ["Real Sociedad", 38, 13, 16, 14, "59-61", "-2", 46, ["L", "D", "D", "L", "D"]],
-            ["Espanyol", 38, 12, 10, 16, "43-55", "-12", 46, ["L", "L", "W", "W", "D"]],
-            ["Athletic", 38, 13, 6, 19, "43-58", "-15", 45, ["W", "L", "L", "D", "L"]],
-            ["Sevilla", 38, 12, 7, 19, "46-60", "-14", 43, ["W", "W", "W", "L", "L"]],
-            ["Alaves", 38, 11, 10, 17, "44-56", "-12", 43, ["L", "D", "W", "W", "L"]],
-            ["Elche", 38, 10, 13, 15, "49-57", "-8", 43, ["L", "D", "L", "W", "D"]],
-            ["Levante", 38, 11, 9, 18, "47-61", "-14", 42, ["L", "W", "W", "W", "L"]],
-            ["Osasuna", 38, 11, 9, 18, "44-50", "-6", 42, ["L", "L", "L", "L", "L"]],
-            ["Mallorca", 38, 11, 9, 18, "47-57", "-10", 42, ["W", "D", "L", "L", "W"]],
-            ["Girona", 38, 9, 14, 15, "39-55", "-16", 41, ["L", "D", "D", "L", "D"]],
-            ["Real Oviedo", 38, 6, 11, 21, "26-60", "-34", 29, ["L", "D", "L", "L", "L"]],
-        ],
-        "premier-league": [
-            ["Arsenal", 38, 26, 7, 5, "71-27", "+44", 85, ["W", "W", "W", "W", "W"]],
-            ["Man City", 38, 23, 9, 6, "77-35", "+42", 78, ["D", "W", "W", "D", "L"]],
-            ["Man United", 38, 20, 11, 7, "69-50", "+19", 71, ["W", "W", "D", "W", "W"]],
-            ["Aston Villa", 38, 19, 8, 11, "56-49", "+7", 65, ["L", "L", "D", "D", "W"]],
-            ["Liverpool", 38, 17, 9, 12, "63-53", "+10", 60, ["W", "L", "L", "L", "D"]],
-            ["Bournemouth", 38, 13, 18, 7, "58-54", "+4", 57, ["D", "W", "D", "W", "D"]],
-            ["Sunderland", 38, 14, 12, 12, "42-48", "-6", 54, ["L", "D", "D", "W", "W"]],
-            ["Brighton", 38, 14, 11, 13, "52-46", "+6", 53, ["W", "L", "W", "L", "L"]],
-            ["Brentford", 38, 14, 11, 13, "55-52", "+3", 53, ["L", "W", "L", "W", "D"]],
-            ["Chelsea", 38, 14, 10, 14, "58-52", "+6", 52, ["L", "L", "W", "W", "L"]],
-            ["Fulham", 38, 15, 7, 16, "47-51", "-4", 52, ["W", "L", "W", "D", "W"]],
-            ["Newcastle", 38, 14, 7, 17, "53-55", "-2", 49, ["L", "W", "W", "W", "L"]],
-            ["Everton", 38, 13, 10, 15, "47-50", "-3", 49, ["L", "D", "D", "L", "L"]],
-            ["Leeds", 38, 11, 14, 13, "49-56", "-7", 47, ["D", "W", "W", "W", "L"]],
-            ["Palace", 38, 11, 12, 15, "41-51", "-10", 45, ["L", "D", "D", "D", "L"]],
-            ["Nottm Forest", 38, 11, 11, 16, "48-51", "-3", 44, ["W", "W", "L", "W", "D"]],
-            ["Spurs", 38, 10, 11, 17, "48-57", "-9", 41, ["W", "W", "L", "L", "W"]],
-            ["West Ham", 38, 10, 9, 19, "46-65", "-19", 39, ["W", "L", "L", "L", "W"]],
-            ["Burnley", 38, 4, 10, 24, "38-75", "-37", 22, ["L", "L", "L", "L", "D"]],
-            ["Wolves", 38, 3, 11, 24, "27-68", "-41", 20, ["L", "L", "L", "L", "L"]],
-        ],
-        "bundesliga": [
-            ["Bayern", 34, 28, 5, 1, "122-36", "+86", 89, ["W", "W", "D", "D", "W"]],
-            ["Dortmund", 34, 22, 7, 5, "70-34", "+36", 73, ["L", "W", "W", "L", "W"]],
-            ["RB Leipzig", 34, 20, 5, 9, "66-47", "+19", 65, ["W", "W", "L", "W", "L"]],
-            ["VfB Stuttgart", 34, 18, 8, 8, "71-49", "+22", 62, ["L", "D", "D", "W", "D"]],
-            ["Hoffenheim", 34, 18, 7, 9, "65-52", "+13", 61, ["W", "W", "D", "W", "L"]],
-            ["Leverkusen", 34, 17, 8, 9, "68-47", "+21", 59, ["L", "W", "W", "L", "D"]],
-            ["Freiburg", 34, 13, 8, 13, "51-57", "-6", 47, ["W", "L", "W", "L", "W"]],
-            ["Eintracht Frankfurt", 34, 11, 11, 12, "61-65", "-4", 44, ["L", "D", "L", "L", "D"]],
-            ["Augsburg", 34, 12, 7, 15, "45-61", "-16", 43, ["W", "D", "W", "W", "L"]],
-            ["Mainz", 34, 10, 10, 14, "44-53", "-9", 40, ["D", "L", "W", "L", "W"]],
-            ["Union Berlin", 34, 10, 9, 15, "44-58", "-14", 39, ["L", "L", "W", "W", "W"]],
-            ["Monchengladbach", 34, 9, 11, 14, "42-53", "-11", 38, ["D", "D", "W", "W", "W"]],
-            ["Hamburg", 34, 9, 11, 14, "40-54", "-14", 38, ["L", "W", "W", "W", "D"]],
-            ["Koln", 34, 7, 11, 16, "49-63", "-14", 32, ["D", "L", "W", "L", "L"]],
-            ["Werder", 34, 8, 8, 18, "37-60", "-23", 32, ["W", "D", "L", "L", "L"]],
-            ["Wolfsburg", 34, 7, 8, 19, "45-69", "-24", 29, ["W", "D", "L", "L", "W"]],
-            ["Heidenheim", 34, 6, 8, 20, "41-72", "-31", 26, ["L", "W", "D", "W", "L"]],
-            ["St. Pauli", 34, 6, 8, 20, "29-60", "-31", 26, ["D", "L", "L", "L", "L"]],
-        ],
-        "serie-a": [
-            ["Inter", 38, 27, 6, 5, "89-35", "+54", 87, ["D", "W", "W", "D", "D"]],
-            ["Napoli", 38, 23, 7, 8, "58-36", "+22", 76, ["W", "D", "L", "W", "W"]],
-            ["Roma", 38, 23, 4, 11, "59-31", "+28", 73, ["W", "W", "W", "W", "W"]],
-            ["Como", 38, 20, 11, 7, "65-29", "+36", 71, ["W", "D", "W", "W", "W"]],
-            ["Milan", 38, 20, 10, 8, "53-35", "+18", 70, ["D", "L", "L", "W", "L"]],
-            ["Juventus", 38, 19, 12, 7, "61-34", "+27", 69, ["D", "D", "W", "L", "D"]],
-            ["Atalanta", 38, 15, 14, 9, "51-36", "+15", 59, ["L", "D", "W", "L", "D"]],
-            ["Bologna", 38, 16, 8, 14, "49-46", "+3", 56, ["L", "W", "W", "W", "D"]],
-            ["Lazio", 38, 14, 12, 12, "41-40", "+1", 54, ["D", "W", "L", "L", "W"]],
-            ["Udinese", 38, 14, 8, 16, "45-48", "-3", 50, ["D", "W", "W", "L", "L"]],
-            ["Sassuolo", 38, 14, 7, 17, "46-50", "-4", 49, ["D", "W", "L", "L", "L"]],
-            ["Torino", 38, 12, 9, 17, "44-63", "-19", 45, ["L", "L", "W", "L", "D"]],
-            ["Parma", 38, 11, 12, 15, "28-46", "-18", 45, ["W", "L", "L", "L", "W"]],
-            ["Cagliari", 38, 11, 10, 17, "40-53", "-13", 43, ["W", "L", "W", "W", "W"]],
-            ["Fiorentina", 38, 9, 15, 14, "41-50", "-9", 42, ["L", "L", "W", "W", "D"]],
-            ["Genoa", 38, 10, 11, 17, "41-51", "-10", 41, ["L", "D", "D", "L", "L"]],
-            ["Lecce", 38, 10, 8, 20, "28-50", "-22", 38, ["W", "W", "L", "W", "W"]],
-            ["Cremonese", 38, 8, 10, 20, "32-57", "-25", 34, ["L", "L", "W", "W", "L"]],
-            ["Verona", 38, 3, 12, 23, "25-61", "-36", 21, ["D", "D", "L", "D", "L"]],
-            ["Pisa", 38, 2, 12, 24, "26-71", "-45", 18, ["L", "L", "L", "L", "L"]],
-        ],
-        "ligue-1": [
-            ["PSG", 34, 24, 4, 6, "74-29", "+45", 76, ["W", "D", "W", "W", "L"]],
-            ["Lens", 34, 22, 4, 8, "66-35", "+31", 70, ["D", "D", "W", "L", "W"]],
-            ["LOSC", 34, 18, 7, 9, "52-37", "+15", 61, ["D", "W", "D", "W", "L"]],
-            ["OL", 34, 18, 6, 10, "53-40", "+13", 60, ["W", "W", "W", "L", "L"]],
-            ["Marseille", 34, 18, 5, 11, "63-45", "+18", 59, ["L", "D", "L", "W", "W"]],
-            ["Rennes", 34, 17, 8, 9, "59-50", "+9", 59, ["W", "W", "L", "W", "L"]],
-            ["Monaco", 34, 16, 6, 12, "60-54", "+6", 54, ["D", "D", "W", "L", "L"]],
-            ["Strasbourg", 34, 15, 8, 11, "58-47", "+11", 53, ["W", "L", "D", "W", "W"]],
-            ["Toulouse", 34, 12, 9, 13, "47-46", "+1", 45, ["L", "L", "D", "W", "W"]],
-            ["Lorient", 34, 11, 12, 11, "48-51", "-3", 45, ["W", "L", "D", "W", "L"]],
-            ["Paris FC", 34, 11, 11, 12, "47-50", "-3", 44, ["W", "L", "W", "L", "W"]],
-            ["Brest", 34, 10, 9, 15, "43-55", "-12", 39, ["D", "L", "L", "L", "D"]],
-            ["Angers", 34, 9, 9, 16, "29-48", "-19", 36, ["D", "L", "L", "D", "D"]],
-            ["Le Havre", 34, 7, 14, 13, "32-44", "-12", 35, ["D", "D", "L", "W", "W"]],
-            ["Auxerre", 34, 8, 10, 16, "34-44", "-10", 34, ["D", "L", "W", "W", "W"]],
-            ["Nice", 34, 7, 11, 16, "37-60", "-23", 32, ["D", "D", "L", "L", "D"]],
-            ["Nantes", 34, 5, 9, 20, "29-52", "-23", 24, ["D", "L", "W", "L", "L"]],
-            ["Metz", 34, 3, 8, 23, "32-76", "-44", 17, ["L", "D", "L", "L", "D"]],
-        ],
         "eredivisie": [
             ["PSV", 34, 27, 3, 4, "101-45", "+56", 84, ["W", "W", "D", "W", "W"]],
             ["Feyenoord", 34, 19, 8, 7, "70-44", "+26", 65, ["D", "W", "W", "D", "W"]],
@@ -1206,69 +1017,6 @@ function getSampleLeagueTable(slug) {
     };
 
     const teams = teamsByLeague[slug];
-
-    const qualificationZonesBySlug = {
-        "champions-league": [
-            {max: 8, zone: "green"},
-            {max: 24, zone: "blue"},
-        ],
-        "europa-league": [
-            {max: 8, zone: "green"},
-            {max: 24, zone: "blue"},
-        ],
-        "laliga": [
-            {max: 5, zone: "blue"},
-            {max: 7, zone: "orange"},
-            {max: 8, zone: "green"},
-            {min: 18, zone: "red"},
-        ],
-        "premier-league": [
-            {max: 5, zone: "blue"},
-            {max: 7, zone: "orange"},
-            {max: 8, zone: "green"},
-            {min: 18, zone: "red"},
-        ],
-        "bundesliga": [
-            {max: 4, zone: "blue"},
-            {max: 6, zone: "orange"},
-            {max: 7, zone: "green"},
-            {min: 17, zone: "red"},
-        ],
-        "serie-a": [
-            {max: 4, zone: "blue"},
-            {max: 6, zone: "orange"},
-            {max: 7, zone: "green"},
-            {min: 18, zone: "red"},
-        ],
-        "ligue-1": [
-            {max: 3, zone: "blue"},
-            {max: 5, zone: "orange"},
-            {max: 6, zone: "green"},
-            {min: 17, zone: "red"},
-        ],
-        "eredivisie": [
-            {max: 2, zone: "blue"},
-            {max: 3, zone: "orange"},
-            {max: 8, zone: "green"},
-            {min: 17, zone: "red"},
-        ],
-    };
-
-    function getQualificationZone(slug, position) {
-        const zones = qualificationZonesBySlug[slug] || [];
-
-        for (const zone of zones) {
-            if (zone.max !== undefined && position <= zone.max) {
-                return zone.zone;
-            }
-
-            if (zone.min !== undefined && position >= zone.min) {
-                return zone.zone;
-            }
-        }
-
-        return null;
-    }
 
     if (slug === "world-cup") {
         const groupsMap = new Map();
@@ -1324,7 +1072,7 @@ function getSampleLeagueTable(slug) {
             goalDiff,
             points,
             form: form || ["W", "W", "W", "D", "L"],
-            qualification: getQualificationZone(slug, position),
+            qualification: getQualificationZoneForSlug(slug, position),
         };
     });
 }
@@ -1404,30 +1152,44 @@ function getSampleKnockout(slug) {
     return knockoutsBySlug[slug] || null;
 }
 
-function getLeagueDetail(slug) {
+async function getLeagueDetail(slug) {
     const meta = leagueDetailSlugs[slug];
 
     if (!meta) {
         return null;
     }
 
-    if (slug === "world-cup") {
-        return {
-            source: "static",
-            league: {
-                slug,
-                id: meta.id,
-                name: meta.name,
-                region: meta.region,
-                image: leagueImages[meta.name] || null,
-            },
-            groups: getSampleLeagueTable("world-cup"),
-            knockout: getSampleKnockout("world-cup"),
-        };
+    const logoFoldersBySlug = {
+        "champions-league": "champions-league",
+        "europa-league": "europa-league",
+        "laliga": "laliga",
+        "premier-league": "premier-league",
+        "bundesliga": "bundesliga",
+        "serie-a": "serie-a",
+        "ligue-1": "ligue-1",
+        "eredivisie": "eredivisie",
+    };
+
+    const staticOnlySlugs = new Set(["europa-league", "eredivisie"]);
+
+    let table;
+    let source;
+
+    if (staticOnlySlugs.has(slug)) {
+        table = getSampleLeagueTable(slug);
+        source = "static";
+    } else {
+        table = await getLiveStandings(slug, logoFoldersBySlug[slug], getQualificationZoneForSlug);
+        source = "football-data.org";
+
+        if (!table) {
+            table = [];
+            source = "unavailable";
+        }
     }
 
     return {
-        source: "static",
+        source,
         league: {
             slug,
             id: meta.id,
@@ -1435,13 +1197,13 @@ function getLeagueDetail(slug) {
             region: meta.region,
             image: leagueImages[meta.name] || null,
         },
-        table: getSampleLeagueTable(slug),
+        table,
         knockout: getSampleKnockout(slug),
     };
 }
 
-app.get("/api/league/:slug", (req, res) => {
-    const detail = getLeagueDetail(req.params.slug);
+app.get("/api/league/:slug", async (req, res) => {
+    const detail = await getLeagueDetail(req.params.slug);
 
     if (!detail) {
         res.status(404).json({error: "Unknown league"});
@@ -1454,23 +1216,26 @@ app.get("/api/league/:slug", (req, res) => {
     });
 });
 
-function startServer(preferredPort) {
+app.use(createLeagueRoutes({pageData, getLeagueDetail}));
+app.use(createAuthRoutes({findUserByEmail, createUser, validateRegistration}));
+app.use(createLineupRoutes());
+
+async function startServer(preferredPort) {
+    await connectToDatabase();
+
     const server = app.listen(preferredPort, () => {
         const address = server.address();
         const activePort = typeof address === "object" && address ? address.port : preferredPort;
-
         console.log(`PitchLive is running at http://localhost:${activePort}`);
     });
 
     server.on("error", (error) => {
         if (error.code === "EADDRINUSE" && !process.env.PORT) {
             const nextPort = preferredPort + 1;
-
             console.log(`Port ${preferredPort} is busy, trying ${nextPort}`);
             startServer(nextPort);
             return;
         }
-
         throw error;
     });
 }

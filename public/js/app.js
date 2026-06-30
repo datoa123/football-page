@@ -200,19 +200,6 @@ async function loadScores() {
     }
 }
 
-if (leagueSidebar) {
-    leagueSidebar.addEventListener("click", (event) => {
-        const leagueLink = event.target.closest("[data-league-slug]");
-
-        if (!leagueLink) {
-            return;
-        }
-
-        event.preventDefault();
-        loadLeagueDetail(leagueLink.dataset.leagueSlug);
-    });
-}
-
 document.querySelector("#prev-day").addEventListener("click", () => {
     scoreMode = "day";
     dayOffset -= 1;
@@ -254,7 +241,7 @@ matchStack.addEventListener("click", (event) => {
     const leagueTabButton = event.target.closest("[data-league-tab]");
 
     if (backButton) {
-        showScoreList();
+        window.location.href = "/";
         return;
     }
 
@@ -293,5 +280,13 @@ matchStack.addEventListener("click", (event) => {
     }
 });
 
-updateDate();
-loadWorldCup();
+if (window.__INITIAL_LEAGUE_DETAIL__) {
+    currentLeagueDetail = window.__INITIAL_LEAGUE_DETAIL__;
+    leagueDetailCache.set(currentLeagueDetail.league.slug, currentLeagueDetail);
+    currentLeagueTab = "table";
+    document.body.classList.remove("is-match-detail");
+    renderLeagueDetail(currentLeagueDetail, matchStack, currentLeagueTab);
+} else {
+    updateDate();
+    loadWorldCup();
+}

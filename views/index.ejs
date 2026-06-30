@@ -49,7 +49,7 @@
             <ul class="league-list">
                 <% topLeagues.forEach((league) => { %>
                     <li>
-                        <a href="#" data-league-slug="<%= league.slug %>">
+                        <a href="/<%= league.slug %>" data-league-slug="<%= league.slug %>">
                             <% if (league.image) { %>
                                 <img class="league-logo" src="<%= league.image %>" alt="" loading="lazy"/>
                             <% } else { %>
@@ -122,6 +122,11 @@
     </aside>
 </main>
 
+<% if (typeof initialLeagueDetail !== 'undefined' && initialLeagueDetail) { %>
+    <script>
+        window.__INITIAL_LEAGUE_DETAIL__ = <%- JSON.stringify(initialLeagueDetail) %>;
+    </script>
+<% } %>
 <script type="module" src="/js/app.js"></script>
 </body>
 </html>

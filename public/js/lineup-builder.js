@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeSlotIdx !== null) renderPlayerList(slots[activeSlotIdx].pos);
     });
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
+    document.getElementById('saveBtn').addEventListener('click', async () => {
         const filled = slots.filter(s => s.player).length;
         if (filled < 11) {
             showToast('Pick ' + (11 - filled) + ' more player' + (11 - filled !== 1 ? 's' : ''), 'error');
@@ -388,47 +388,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const lineup = slots.map(s => ({
             pos: s.pos,
-            id: s.player?.id,
-            name: s.player?.web_name,
+            id: s.player?.id ?? null,
+            name: s.player?.web_name ?? null,
             team: s.player ? getTeamName(s.player.team) : null,
         }));
+
         try {
-            localStorage.setItem('pitchlive_xi', JSON.stringify({formation: currentFormation, lineup}));
+            const res = await fetch('/api/lineup', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({formation: currentFormation, lineup}),
+            });
+
+            if (res.status === 401) {
+                showToast('Log in to save your lineup', 'error');
+                return;
+            }
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+
             showToast('Lineup saved!', 'success');
         } catch (e) {
-            showToast('Lineup saved!', 'success'); // still show success even if localStorage blocked
+            console.error('Save lineup error:', e);
+            showToast('Could not save lineup', 'error');
         }
     });
 
-    document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('clearBtn').addEventListener('click', async () => {
         slots.forEach(s => s.player = null);
         refresh();
-        showToast('Lineup cleared');
+
+        try {
+            const res = await fetch('/api/lineup', {method: 'DELETE'});
+            if (res.status === 401) {
+                showToast('Lineup cleared (log in to clear saved data)');
+                return;
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            showToast('Lineup cleared');
+        } catch (e) {
+            console.error('Clear lineup error:', e);
+            showToast('Cleared locally, but could not clear saved lineup', 'error');
+        }
     });
 
     buildSlots(currentFormation);
     refresh();
     loadPlayers();
 
-    try {
-        const saved = JSON.parse(localStorage.getItem('pitchlive_xi') || 'null');
-        if (saved && saved.lineup) {
-            currentFormation = saved.formation || currentFormation;
-            document.querySelectorAll('.formation-btn').forEach(b => {
-                b.classList.toggle('active', b.dataset.formation === currentFormation);
-            });
-            buildSlots(currentFormation);
-            loadPlayers().then(() => {
+    (async () => {
+        try {
+            const res = await fetch('/api/lineup');
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const saved = data.lineup;
+
+            if (saved && saved.lineup) {
+                currentFormation = saved.formation || currentFormation;
+                document.querySelectorAll('.formation-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.formation === currentFormation);
+                });
+                buildSlots(currentFormation);
+                await loadPlayers();
                 saved.lineup.forEach((pick, i) => {
                     if (pick.id && slots[i]) {
                         slots[i].player = players.find(p => p.id === pick.id) || null;
                     }
                 });
                 refresh();
-            });
-
+            }
+        } catch (e) {
+            console.error('Load saved lineup error:', e);
         }
-    } catch (_) {
-    }
+    })();
 
 });
